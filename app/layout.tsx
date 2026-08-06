@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./alpha.css";
+import CalendarNavigation from "./calendar-navigation";
 
 export const metadata: Metadata = {
   title: "House of Doms",
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="de">
-      <body>{children}</body>
+      <body>
+        <CalendarNavigation />
+        {children}
+      </body>
     </html>
   );
 }
