@@ -8,21 +8,20 @@ export default function CalendarNavigation() {
       const target = event.target as HTMLElement | null;
       const button = target?.closest("button");
       const label = button?.textContent?.trim();
-
-      if (label === "Kalender" || label === "Calendar") {
+      const routes: Record<string,string> = {
+        Aufgaben: "/aufgaben", Tasks: "/aufgaben",
+        Kalender: "/kalender", Calendar: "/kalender",
+        Bewerbungen: "/bewerbungen", Applications: "/bewerbungen",
+        Journal: "/journal",
+        "House-Einstellungen": "/house-einstellungen", "House Settings": "/house-einstellungen"
+      };
+      if (label && routes[label]) {
         event.preventDefault();
-        window.location.assign("/kalender");
-      }
-
-      if (label === "Bewerbungen" || label === "Applications") {
-        event.preventDefault();
-        window.location.assign("/bewerbungen");
+        window.location.assign(routes[label]);
       }
     };
-
     document.addEventListener("click", handleClick, true);
     return () => document.removeEventListener("click", handleClick, true);
   }, []);
-
   return null;
 }
