@@ -4,6 +4,7 @@ import "./alpha.css";
 import "./experience-layer.css";
 import CalendarNavigation from "./calendar-navigation";
 import ExperienceLayer from "./experience-layer";
+import PublicDirectoryNav from "./public-directory-nav";
 
 export const metadata: Metadata = {
   title: "House of Doms",
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <CalendarNavigation />
         <ExperienceLayer />
+        <PublicDirectoryNav />
         {children}
       </body>
     </html>
