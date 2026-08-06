@@ -10,6 +10,7 @@ export default function CalendarNavigation() {
       const label = button?.textContent?.trim();
       const routes: Record<string,string> = {
         Aufgaben: "/aufgaben", Tasks: "/aufgaben",
+        "House Store": "/store",
         Kalender: "/kalender", Calendar: "/kalender",
         Bewerbungen: "/bewerbungen", Applications: "/bewerbungen",
         Journal: "/journal",
