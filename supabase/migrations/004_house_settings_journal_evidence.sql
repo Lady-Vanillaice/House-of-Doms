@@ -8,7 +8,12 @@ alter table public.houses
 
 alter table public.tasks
   add column if not exists required_proof_types text[] not null default array[]::text[],
-  add constraint tasks_required_proof_types_valid check (required_proof_types <@ array['text','image','video']::text[]);
+  add column if not exists release_at timestamptz not null default now(),
+  add column if not exists calendar_teaser text not null default '1 Aufgabe geplant',
+  add constraint tasks_required_proof_types_valid check (required_proof_types <@ array['text','image','video']::text[]),
+  add constraint tasks_release_before_due check (due_at is null or release_at <= due_at);
+
+create index if not exists tasks_release_at_idx on public.tasks(assigned_to, release_at);
 
 create table if not exists public.task_submissions (
   id uuid primary key default gen_random_uuid(),
@@ -47,8 +52,25 @@ alter table public.task_submissions enable row level security;
 alter table public.task_submission_files enable row level security;
 alter table public.journal_entries enable row level security;
 
+-- Doms always see tasks they created. Subs only receive full task rows at release time.
+drop policy if exists "Aufgaben beteiligter Personen lesen" on public.tasks;
+create policy "dom reads created tasks" on public.tasks for select to authenticated using (created_by = auth.uid());
+create policy "sub reads released tasks" on public.tasks for select to authenticated using (assigned_to = auth.uid() and release_at <= now());
+
+-- Safe calendar teaser view exposes no title or description before release.
+create or replace view public.task_calendar_feed with (security_invoker=true) as
+select id, house_id, assigned_to, release_at, due_at,
+  case when release_at <= now() then title else calendar_teaser end as display_title,
+  case when release_at <= now() then status::text else 'planned' end as display_status,
+  (release_at <= now()) as is_released
+from public.tasks;
+
+grant select on public.task_calendar_feed to authenticated;
+
 create policy "sub reads own submissions" on public.task_submissions for select using (submitted_by = auth.uid());
-create policy "sub creates own submissions" on public.task_submissions for insert with check (submitted_by = auth.uid());
+create policy "sub creates own submissions" on public.task_submissions for insert with check (
+  submitted_by = auth.uid() and exists(select 1 from public.tasks t where t.id=task_id and t.assigned_to=auth.uid() and t.release_at<=now())
+);
 create policy "sub updates requested submissions" on public.task_submissions for update using (submitted_by = auth.uid() and status in ('draft','changes_requested'));
 create policy "dom reads house submissions" on public.task_submissions for select using (
   exists(select 1 from public.tasks t join public.houses h on h.id=t.house_id where t.id=task_id and h.owner_id=auth.uid())
