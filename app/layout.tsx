@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./alpha.css";
 
 export const metadata: Metadata = {
   title: "House of Doms",
-  description: "Consensual D/s task and agreement management"
+  description: "Persönliche Plattform für einvernehmliche D/s-Dynamiken"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
