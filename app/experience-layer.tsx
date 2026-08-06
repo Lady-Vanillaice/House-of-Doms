@@ -52,7 +52,9 @@ export default function ExperienceLayer() {
     return () => { observer.disconnect(); document.removeEventListener("click", handleEnter, true); };
   }, []);
 
-  useEffect(() => document.body.classList.toggle("houseFocusMode", focus), [focus]);
+  useEffect(() => {
+    document.body.classList.toggle("houseFocusMode", focus);
+  }, [focus]);
 
   const copyKey = async () => {
     await navigator.clipboard?.writeText("HOD-0001");
