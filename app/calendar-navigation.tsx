@@ -13,6 +13,11 @@ export default function CalendarNavigation() {
         event.preventDefault();
         window.location.assign("/kalender");
       }
+
+      if (label === "Bewerbungen" || label === "Applications") {
+        event.preventDefault();
+        window.location.assign("/bewerbungen");
+      }
     };
 
     document.addEventListener("click", handleClick, true);
