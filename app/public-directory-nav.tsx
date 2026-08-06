@@ -8,10 +8,13 @@ export default function PublicDirectoryNav() {
   const pathname = usePathname();
   return (
     <nav className="publicDirectoryNav" aria-label="Öffentliche Bereiche">
-      <span>ENTDECKEN</span>
-      <Link className={pathname.startsWith("/discover") ? "active" : ""} href="/discover">Discover</Link>
-      <Link className={pathname.startsWith("/studios") ? "active" : ""} href="/studios">Studios</Link>
-      <Link className={pathname.startsWith("/houses") ? "active" : ""} href="/houses">Houses</Link>
+      <Link className={`discoverSpotlight ${pathname.startsWith("/discover") ? "active" : ""}`} href="/discover"><b>✦</b><span>DISCOVER</span><small>Doms & Subs finden</small></Link>
+      <div className="publicDirectoryLinks">
+        <Link className={pathname.startsWith("/studios") ? "active" : ""} href="/studios">Studios</Link>
+        <Link className={pathname.startsWith("/houses") ? "active" : ""} href="/houses">Houses</Link>
+        <Link className={pathname.startsWith("/store") ? "active" : ""} href="/store">Store</Link>
+        <Link className={pathname.startsWith("/tribute") ? "active" : ""} href="/tribute">Tribute</Link>
+      </div>
     </nav>
   );
 }
