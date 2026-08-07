@@ -65,7 +65,7 @@ export default function Home() {
 
   return (
     <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
-      <img className="referenceBackdrop" src="/house-entrance-reference.webp" alt="" aria-hidden="true" />
+      <div className="referenceBackdrop" aria-hidden="true" />
       <div className="referenceVignette" aria-hidden="true" />
 
       <header className="referenceNav">
