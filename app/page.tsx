@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
 import "./entrance.css";
 import "./entrance-motion.css";
+import "./entrance-brand.css";
 
 type Lang = "de" | "en";
 
@@ -16,20 +17,7 @@ const copy = {
     hint: "Die Tür berühren, um einzutreten",
     legal: "Nur für volljährige Personen · freiwillig · einvernehmlich · privat",
     aria: "House of Doms Eingang",
-    flyingWords: [
-      "MEIN HOUSE",
-      "MEINE REGELN",
-      "MEIN KOMMANDO",
-      "PRIVATE KAMMER",
-      "AUFGABEN",
-      "JOURNAL",
-      "HOUSE STORE",
-      "KALENDER",
-      "BEWERBUNGEN",
-      "HOUSE-EINSTELLUNGEN",
-      "HOUSE-SCHLÜSSEL",
-      "WILLKOMMEN ZU HAUSE",
-    ],
+    flyingWords: ["MEIN HOUSE","MEINE REGELN","MEIN KOMMANDO","PRIVATE KAMMER","AUFGABEN","JOURNAL","HOUSE STORE","KALENDER","BEWERBUNGEN","HOUSE-EINSTELLUNGEN","HOUSE-SCHLÜSSEL","WILLKOMMEN ZU HAUSE"],
   },
   en: {
     discover: "Discover",
@@ -38,20 +26,7 @@ const copy = {
     hint: "Touch the door to enter",
     legal: "Adults only · voluntary · consensual · private",
     aria: "House of Doms entrance",
-    flyingWords: [
-      "MY HOUSE",
-      "MY RULES",
-      "MY COMMAND",
-      "PRIVATE CHAMBER",
-      "TASKS",
-      "JOURNAL",
-      "HOUSE STORE",
-      "CALENDAR",
-      "APPLICATIONS",
-      "HOUSE SETTINGS",
-      "HOUSE KEY",
-      "WELCOME HOME",
-    ],
+    flyingWords: ["MY HOUSE","MY RULES","MY COMMAND","PRIVATE CHAMBER","TASKS","JOURNAL","HOUSE STORE","CALENDAR","APPLICATIONS","HOUSE SETTINGS","HOUSE KEY","WELCOME HOME"],
   },
 } as const;
 
@@ -63,9 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     const stored = window.localStorage.getItem("house-language");
-    const initial: Lang = stored === "en" || stored === "de"
-      ? stored
-      : navigator.language.toLowerCase().startsWith("en") ? "en" : "de";
+    const initial: Lang = stored === "en" || stored === "de" ? stored : navigator.language.toLowerCase().startsWith("en") ? "en" : "de";
     setLang(initial);
     document.documentElement.lang = initial;
   }, []);
@@ -110,28 +83,17 @@ export default function Home() {
           <div className="doorLight" aria-hidden="true" />
           <div className="lantern left" aria-hidden="true"><span /></div>
           <div className="lantern right" aria-hidden="true"><span /></div>
-
           <div className="arch">
             <div className="archCrown" aria-hidden="true" />
-            <div className="transom" aria-hidden="true">
-              <span className="transomRay rayOne" />
-              <span className="transomRay rayTwo" />
-              <span className="transomRay rayThree" />
-            </div>
-
+            <div className="transom" aria-hidden="true"><span className="transomRay rayOne" /><span className="transomRay rayTwo" /><span className="transomRay rayThree" /></div>
             <div className="doubleDoor">
               <div className="doorLeaf doorLeft" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
               <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
-              <div className="doorOrnament" aria-hidden="true">
-                <img src="/door-emblem.svg" alt="" />
-              </div>
+              <div className="doorOrnament" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
               <div className="handles" aria-hidden="true"><span /><span /></div>
-              <button className="enterOverlay" type="button" onClick={enterHouse} aria-label={t.enter}>
-                <span>{t.enter}</span>
-              </button>
+              <button className="enterOverlay" type="button" onClick={enterHouse} aria-label={t.enter}><span>{t.enter}</span></button>
             </div>
           </div>
-
           <div className="steps" aria-hidden="true"><span /><span /><span /></div>
         </div>
 
@@ -150,11 +112,7 @@ export default function Home() {
       <div className="entranceHint">{t.hint}</div>
 
       <div className="wordBurst" aria-hidden="true">
-        {t.flyingWords.map((word, index) => (
-          <span key={`${lang}-${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>
-            {word}
-          </span>
-        ))}
+        {t.flyingWords.map((word, index) => <span key={`${lang}-${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>{word}</span>)}
       </div>
     </main>
   );
