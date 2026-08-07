@@ -1,0 +1,22 @@
+:root{--purple:#7a101c;--crimson:#7a101c;--crimson-deep:#5b0a12;--crimson-glow:rgba(170,24,42,.42)}
+.landing{background:radial-gradient(circle at 20% 20%,rgba(122,16,28,.24),transparent 38%),linear-gradient(135deg,#090707,#10090a 58%,#060606)}
+.ambientOne{background:#5b0a12}
+.roleChoice .selected{background:linear-gradient(135deg,rgba(215,182,107,.12),rgba(122,16,28,.12))}
+.doorFrame{box-shadow:0 40px 90px rgba(0,0,0,.75),0 0 80px rgba(122,16,28,.18)}
+.onboarding{background:radial-gradient(circle at 50% 15%,rgba(122,16,28,.22),transparent 35%),var(--bg)}
+.appShell{background:radial-gradient(circle at 85% 5%,rgba(122,16,28,.16),transparent 26%),var(--bg)}
+.houseIdentity,.welcomeCard{background:linear-gradient(135deg,rgba(215,182,107,.08),rgba(122,16,28,.1))}
+.profileChip>span,.message>span,.thread>span{background:linear-gradient(135deg,#8b1421,#4d070d)}
+.outgoing{background:linear-gradient(135deg,#5b0a12,#8f1726)}
+.productVisual{background:linear-gradient(135deg,rgba(122,16,28,.34),rgba(215,182,107,.18))}
+.doorCinematic.antiqueEntrance{background:radial-gradient(circle at 50% 48%,rgba(112,12,24,.28),transparent 34%),linear-gradient(180deg,#030303,#0a0506 48%,#010101)}
+.ancientFog{background:radial-gradient(ellipse at 50% 72%,rgba(122,16,28,.3),transparent 36%),radial-gradient(ellipse at 20% 40%,rgba(255,255,255,.035),transparent 20%),radial-gradient(ellipse at 80% 35%,rgba(255,255,255,.025),transparent 18%)}
+.doorSeamLight{background:linear-gradient(180deg,rgba(248,213,132,.05),rgba(209,178,103,.62) 42%,rgba(132,14,29,.72) 72%,rgba(255,225,151,.08))}
+.flyingWords span{text-shadow:0 12px 30px rgba(0,0,0,.7),0 0 24px rgba(170,24,42,.58)}
+.entranceAuthCard{box-shadow:0 35px 120px rgba(0,0,0,.72),0 0 80px rgba(122,16,28,.24)}
+.entranceAuthActions a:last-child{border-color:#5b2026}
+.houseGadgets button{border-color:#4a2027;background:linear-gradient(145deg,rgba(35,16,19,.96),rgba(10,7,8,.96))}
+.houseGadgets button:hover,.houseGadgets button.enabled{box-shadow:0 12px 35px rgba(170,24,42,.28)}
+.gadgetPanel{border-color:#4a2027;background:linear-gradient(145deg,rgba(35,16,19,.98),rgba(8,7,8,.98))}
+.digitalHouseKey{background:radial-gradient(circle at top right,rgba(122,16,28,.5),transparent 42%),linear-gradient(135deg,#1c0d10,#070606)}
+.publicDirectoryNav a:hover,.publicDirectoryNav a.active{background:rgba(122,16,28,.22)!important;color:#e2c36e!important}
