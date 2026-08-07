@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
 import "./entrance-reference.css";
+import "./entrance-jpg-fix.css";
 
 type Lang = "de" | "en";
 
