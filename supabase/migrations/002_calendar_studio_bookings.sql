@@ -1,36 +1,7 @@
 -- House of Doms: Kalender, Studio-Tage und Buchungen
--- Diese Migration ist idempotent und kann gefahrlos erneut ausgeführt werden.
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_type t
-    JOIN pg_namespace n ON n.oid = t.typnamespace
-    WHERE t.typname = 'calendar_event_type' AND n.nspname = 'public'
-  ) THEN
-    CREATE TYPE public.calendar_event_type AS ENUM ('task', 'studio_day', 'booking', 'personal');
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_type t
-    JOIN pg_namespace n ON n.oid = t.typnamespace
-    WHERE t.typname = 'booking_status' AND n.nspname = 'public'
-  ) THEN
-    CREATE TYPE public.booking_status AS ENUM ('requested', 'confirmed', 'declined', 'cancelled', 'completed');
-  END IF;
-END
-$$;
-
-ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'task';
-ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'studio_day';
-ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'booking';
-ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'personal';
-
-ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'requested';
-ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'confirmed';
-ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'declined';
-ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'cancelled';
-ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'completed';
+-- Idempotent und sicher bei teilweise bereits ausgeführten Migrationen.
+-- Statusfelder werden bewusst als TEXT mit Check-Constraints geführt,
+-- damit vorhandene/alte Enum-Typen keinen Transaktionsfehler verursachen.
 
 CREATE TABLE IF NOT EXISTS public.studio_days (
   id uuid primary key default gen_random_uuid(),
@@ -70,7 +41,7 @@ CREATE TABLE IF NOT EXISTS public.slot_bookings (
   slot_id uuid not null references public.studio_slots(id) on delete cascade,
   house_id uuid not null references public.houses(id) on delete cascade,
   requester_id uuid not null references public.profiles(id) on delete cascade,
-  status public.booking_status not null default 'requested',
+  status text not null default 'requested' check (status in ('requested','confirmed','declined','cancelled','completed')),
   note text,
   dom_note text,
   price_cents integer,
@@ -81,11 +52,38 @@ CREATE TABLE IF NOT EXISTS public.slot_bookings (
   unique (slot_id, requester_id)
 );
 
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'slot_bookings' AND column_name = 'status'
+      AND udt_name <> 'text'
+  ) THEN
+    ALTER TABLE public.slot_bookings ALTER COLUMN status DROP DEFAULT;
+    ALTER TABLE public.slot_bookings ALTER COLUMN status TYPE text USING status::text;
+  END IF;
+END $$;
+
+ALTER TABLE public.slot_bookings ALTER COLUMN status SET DEFAULT 'requested';
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'slot_bookings_status_check'
+      AND conrelid = 'public.slot_bookings'::regclass
+  ) THEN
+    ALTER TABLE public.slot_bookings
+      ADD CONSTRAINT slot_bookings_status_check
+      CHECK (status in ('requested','confirmed','declined','cancelled','completed'));
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS public.calendar_events (
   id uuid primary key default gen_random_uuid(),
   house_id uuid not null references public.houses(id) on delete cascade,
   owner_id uuid not null references public.profiles(id) on delete cascade,
-  event_type public.calendar_event_type not null,
+  event_type text not null check (event_type in ('task','studio_day','booking','personal')),
   title text not null,
   description text,
   event_date date not null,
@@ -99,6 +97,30 @@ CREATE TABLE IF NOT EXISTS public.calendar_events (
   updated_at timestamptz not null default now(),
   check (ends_at is null or starts_at is null or ends_at > starts_at)
 );
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'calendar_events' AND column_name = 'event_type'
+      AND udt_name <> 'text'
+  ) THEN
+    ALTER TABLE public.calendar_events ALTER COLUMN event_type TYPE text USING event_type::text;
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'calendar_events_event_type_check'
+      AND conrelid = 'public.calendar_events'::regclass
+  ) THEN
+    ALTER TABLE public.calendar_events
+      ADD CONSTRAINT calendar_events_event_type_check
+      CHECK (event_type in ('task','studio_day','booking','personal'));
+  END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS studio_days_house_date_idx ON public.studio_days(house_id, event_date);
 CREATE INDEX IF NOT EXISTS studio_slots_day_idx ON public.studio_slots(studio_day_id, starts_at);
@@ -156,15 +178,13 @@ ON public.studio_slots FOR ALL
 USING (
   EXISTS (
     SELECT 1 FROM public.studio_days sd
-    WHERE sd.id = studio_slots.studio_day_id
-      AND sd.creator_id = auth.uid()
+    WHERE sd.id = studio_slots.studio_day_id AND sd.creator_id = auth.uid()
   )
 )
 WITH CHECK (
   EXISTS (
     SELECT 1 FROM public.studio_days sd
-    WHERE sd.id = studio_slots.studio_day_id
-      AND sd.creator_id = auth.uid()
+    WHERE sd.id = studio_slots.studio_day_id AND sd.creator_id = auth.uid()
   )
 );
 
@@ -175,8 +195,7 @@ USING (
   requester_id = auth.uid()
   OR EXISTS (
     SELECT 1 FROM public.houses h
-    WHERE h.id = slot_bookings.house_id
-      AND h.owner_id = auth.uid()
+    WHERE h.id = slot_bookings.house_id AND h.owner_id = auth.uid()
   )
 );
 
@@ -187,8 +206,7 @@ WITH CHECK (
   requester_id = auth.uid()
   AND EXISTS (
     SELECT 1 FROM public.studio_slots ss
-    WHERE ss.id = slot_bookings.slot_id
-      AND ss.is_available = true
+    WHERE ss.id = slot_bookings.slot_id AND ss.is_available = true
   )
   AND EXISTS (
     SELECT 1 FROM public.memberships m
@@ -205,16 +223,14 @@ USING (
   requester_id = auth.uid()
   OR EXISTS (
     SELECT 1 FROM public.houses h
-    WHERE h.id = slot_bookings.house_id
-      AND h.owner_id = auth.uid()
+    WHERE h.id = slot_bookings.house_id AND h.owner_id = auth.uid()
   )
 )
 WITH CHECK (
   requester_id = auth.uid()
   OR EXISTS (
     SELECT 1 FROM public.houses h
-    WHERE h.id = slot_bookings.house_id
-      AND h.owner_id = auth.uid()
+    WHERE h.id = slot_bookings.house_id AND h.owner_id = auth.uid()
   )
 );
 
@@ -249,14 +265,8 @@ DECLARE
   slot_end time;
 BEGIN
   SELECT * INTO studio FROM public.studio_days WHERE id = day_id;
-
-  IF studio.id IS NULL THEN
-    RAISE EXCEPTION 'studio day not found';
-  END IF;
-
-  IF studio.creator_id <> auth.uid() THEN
-    RAISE EXCEPTION 'not allowed';
-  END IF;
+  IF studio.id IS NULL THEN RAISE EXCEPTION 'studio day not found'; END IF;
+  IF studio.creator_id <> auth.uid() THEN RAISE EXCEPTION 'not allowed'; END IF;
 
   DELETE FROM public.studio_slots WHERE studio_day_id = day_id;
   cursor_time := studio.starts_at;
@@ -264,10 +274,8 @@ BEGIN
   LOOP
     slot_end := cursor_time + make_interval(mins => studio.slot_length_minutes);
     EXIT WHEN slot_end > studio.ends_at;
-
     INSERT INTO public.studio_slots(studio_day_id, starts_at, ends_at)
     VALUES(day_id, cursor_time, slot_end);
-
     cursor_time := slot_end + make_interval(mins => studio.break_minutes);
   END LOOP;
 END;
