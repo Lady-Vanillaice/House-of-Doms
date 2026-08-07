@@ -1,5 +1,16 @@
 -- House OS 2 — Chamber v2 + editable Domina calendar
 
+-- Expand private chamber media bucket for voice notes and general files.
+update storage.buckets
+set file_size_limit=104857600,
+    allowed_mime_types=array[
+      'image/jpeg','image/png','image/webp','image/gif','image/heic',
+      'video/mp4','video/quicktime','video/webm',
+      'audio/mpeg','audio/mp4','audio/x-m4a','audio/wav','audio/webm','audio/ogg',
+      'application/pdf','text/plain','application/zip'
+    ]
+where id='chamber-media';
+
 create or replace function public.get_chamber_messages_v2(p_other_user uuid)
 returns table(
  id uuid,sender_id uuid,recipient_id uuid,body text,attachment_type text,attachment_path text,
@@ -25,7 +36,7 @@ begin
  if auth.uid() is null then raise exception 'Bitte zuerst anmelden.'; end if;
  if p_recipient_id is null or p_recipient_id=auth.uid() then raise exception 'Ungültiger Empfänger.'; end if;
  if nullif(trim(coalesce(p_body,'')),'') is null and p_attachment_path is null and p_linked_task_id is null and p_linked_booking_id is null then raise exception 'Nachricht ist leer.'; end if;
- if p_attachment_type is not null and p_attachment_type not in ('image','video') then raise exception 'Ungültiger Anhang.'; end if;
+ if p_attachment_type is not null and p_attachment_type not in ('image','video','audio','file') then raise exception 'Ungültiger Anhang.'; end if;
  if p_reply_to_id is not null and not exists(select 1 from public.messages r where r.id=p_reply_to_id and auth.uid() in (r.sender_id,r.recipient_id)) then raise exception 'Antwortziel nicht erlaubt.'; end if;
  insert into public.messages(sender_id,recipient_id,body,attachment_type,attachment_path,linked_task_id,linked_booking_id,reply_to_id)
  values(auth.uid(),p_recipient_id,nullif(trim(coalesce(p_body,'')),''),p_attachment_type,p_attachment_path,p_linked_task_id,p_linked_booking_id,p_reply_to_id)
