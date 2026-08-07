@@ -7,6 +7,7 @@ const sections=[
  ["Aufgaben","Aufgaben, Nachweise, Vorlagen und Freigaben","/aufgaben"],
  ["Aufgaben-Vorlagen","Wiederverwendbare Aufgaben und Serien vorbereiten","/aufgaben/vorlagen"],
  ["Kalender","Studio, Sessions, Handy-Kalender und Buchungen","/kalender"],
+ ["Studiozeiten verwalten","Bestehende Zeitfenster bearbeiten, Konflikte prüfen und duplizieren","/kalender/studio-verwalten"],
  ["Journal","Reflexionen und Verlauf","/journal"],
  ["Keuschhaltung","Status, Regeln, Laufzeit und Check-ins","/keuschhaltung"],
  ["Studio","Studios und verfügbare Zeiten","/studios"],
