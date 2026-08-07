@@ -10,10 +10,15 @@ import PublicDirectoryNav from "./public-directory-nav";
 import QuickActions from "./quick-actions";
 import AuthenticatedBackRouter from "./authenticated-back-router";
 import DomCalendarSubscribe from "./dom-calendar-subscribe";
+import PwaRegister from "./pwa-register";
 
 export const metadata: Metadata = {
   title: "House of Doms",
-  description: "Persönliche Plattform für einvernehmliche D/s-Dynamiken"
+  description: "Persönliche Plattform für einvernehmliche D/s-Dynamiken",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#7d101c",
+  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  appleWebApp: { capable: true, title: "House of Doms", statusBarStyle: "black-translucent" }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -26,6 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <PublicDirectoryNav />
         <QuickActions />
         <DomCalendarSubscribe />
+        <PwaRegister />
         {children}
       </body>
     </html>

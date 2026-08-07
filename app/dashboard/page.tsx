@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
 import DomLiveMetrics from "./dom-live-metrics";
+import SubLiveStatus from "./sub-live-status";
 import "./dashboard.css";
 
 type TaskFeedItem = { id:string; assigned_to:string; release_at:string; is_released:boolean; status:string; title?:string };
@@ -13,10 +14,11 @@ const cards=[
   ["Kalender","Studio-Zeiten, Sessions und Termine", "/kalender","◷"],
   ["Aufgaben","Aufgaben erstellen, Vorlagen und Nachweise", "/aufgaben","✓"],
   ["Mitglieder","Sub-Akten, Verlauf und House-Mitglieder", "/mitglieder","◎"],
+  ["Timeline","Alle House-Aktivitäten chronologisch", "/timeline","⌁"],
   ["Keuschhaltung","Status, Check-ins und Vereinbarungen", "/keuschhaltung","◇"],
   ["Kassenbuch","Einnahmen, Ausgaben und Monatsübersicht", "/kassenbuch","€"]
 ] as const;
-const activity=["Neue Nachrichten prüfen","Heutige Studio-Zeiten ansehen","Offene Aufgaben kontrollieren","Sub-Akten ansehen"];
+const activity=["Neue Nachrichten prüfen","Heutige Studio-Zeiten ansehen","Offene Aufgaben kontrollieren","House Timeline ansehen"];
 
 function splitCountdown(ms:number){
   const safe=Math.max(0,ms);
@@ -85,6 +87,7 @@ export default function DashboardPage(){
         </>:<p className="countdownSecret">Sobald eine neue Aufgabe geplant wurde, erscheint hier der Countdown.</p>}
         <Link className="countdownAction" href="/aufgaben">Zu meinen Aufgaben →</Link>
       </section>
+      <SubLiveStatus/>
       <section className="subQuickGrid">
         <Link href="/kammer"><span>✦</span><strong>Kammer</strong><small>Nachrichten öffnen</small></Link>
         <Link href="/kalender"><span>◷</span><strong>Kalender</strong><small>Termine ansehen</small></Link>
@@ -95,10 +98,10 @@ export default function DashboardPage(){
   }
 
   return <main className="commandDashboard">
-    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Live-Zahlen, Mitglieder, Aufgaben, Sessions und Finanzen an einem Ort.</p></div><div className="commandSeal"><span>H</span><small>PRIVATE HOUSE OS</small></div></header>
+    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Live-Zahlen, Mitglieder, Aufgaben, Sessions, Timeline und Finanzen an einem Ort.</p></div><div className="commandSeal"><span>H</span><small>PRIVATE HOUSE OS</small></div></header>
     {!loading && <DomLiveMetrics/>}
-    <section className="commandStrip"><Link href="/kammer"><span>Nachrichten</span><strong>Öffnen</strong></Link><Link href="/kalender"><span>Heute</span><strong>Kalender</strong></Link><Link href="/mitglieder"><span>House</span><strong>Sub-Akten</strong></Link><Link href="/discover"><span>Community</span><strong>Discover</strong></Link></section>
+    <section className="commandStrip"><Link href="/kammer"><span>Nachrichten</span><strong>Öffnen</strong></Link><Link href="/kalender"><span>Heute</span><strong>Kalender</strong></Link><Link href="/timeline"><span>Live</span><strong>Timeline</strong></Link><Link href="/mitglieder"><span>House</span><strong>Sub-Akten</strong></Link></section>
     <section className="commandGrid">{cards.map(([title,text,href,icon])=><Link className="commandCard" href={href} key={href}><i>{icon}</i><div><span>DIREKTZUGRIFF</span><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}</section>
-    <section className="commandLower"><article><span className="commandEyebrow">HEUTE</span><h2>Was als Nächstes ansteht</h2>{activity.map((x,i)=><Link key={x} href={["/kammer","/kalender","/aufgaben","/mitglieder"][i]}><em>0{i+1}</em><span>{x}</span><b>→</b></Link>)}</article><article className="housePortal"><span className="commandEyebrow">DEIN HOUSE</span><h2>Alle Werkzeuge.<br/>Eine Zentrale.</h2><p>Mitglieder, Journal, Tribute, Studio, Homepage, Store, Keuschhaltung, Kassenbuch und Einstellungen liegen gesammelt im House-Bereich.</p><Link href="/house">House öffnen →</Link></article></section>
+    <section className="commandLower"><article><span className="commandEyebrow">HEUTE</span><h2>Was als Nächstes ansteht</h2>{activity.map((x,i)=><Link key={x} href={["/kammer","/kalender","/aufgaben","/timeline"][i]}><em>0{i+1}</em><span>{x}</span><b>→</b></Link>)}</article><article className="housePortal"><span className="commandEyebrow">DEIN HOUSE</span><h2>Alle Werkzeuge.<br/>Eine Zentrale.</h2><p>Mitglieder, Timeline, Journal, Tribute, Studio, Homepage, Store, Keuschhaltung, Kassenbuch und Einstellungen liegen gesammelt im House-Bereich.</p><Link href="/house">House öffnen →</Link></article></section>
   </main>;
 }
