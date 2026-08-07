@@ -98,7 +98,7 @@ export default function DashboardPage(){
   }
 
   return <main className="commandDashboard">
-    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Live-Zahlen, Mitglieder, Aufgaben, Sessions, Timeline und Finanzen an einem Ort.</p></div><div className="commandSeal"><span>H</span><small>PRIVATE HOUSE OS</small></div></header>
+    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Live-Zahlen, Mitglieder, Aufgaben, Sessions, Timeline und Finanzen an einem Ort.</p></div><div className="commandSeal" aria-label="House of Doms Wappen"><img src="/door-emblem.svg" alt="House of Doms Wappen"/><small>PRIVATE HOUSE OS</small></div></header>
     {!loading && <DomLiveMetrics/>}
     <section className="commandStrip"><Link href="/kammer"><span>Nachrichten</span><strong>Öffnen</strong></Link><Link href="/kalender"><span>Heute</span><strong>Kalender</strong></Link><Link href="/timeline"><span>Live</span><strong>Timeline</strong></Link><Link href="/mitglieder"><span>House</span><strong>Sub-Akten</strong></Link></section>
     <section className="commandGrid">{cards.map(([title,text,href,icon])=><Link className="commandCard" href={href} key={href}><i>{icon}</i><div><span>DIREKTZUGRIFF</span><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}</section>
