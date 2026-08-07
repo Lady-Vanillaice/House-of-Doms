@@ -59,9 +59,8 @@ export default function Home() {
         <div className="referenceVignette" aria-hidden="true" />
         <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
         <div className="referenceDoorGlow" aria-hidden="true" />
+        <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
       </div>
-
-      <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
     </main>
   );
 }
