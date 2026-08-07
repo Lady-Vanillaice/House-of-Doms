@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "../../lib/supabase/client";
+import DomLiveMetrics from "./dom-live-metrics";
 import "./dashboard.css";
 
 type TaskFeedItem = { id:string; assigned_to:string; release_at:string; is_released:boolean; status:string; title?:string };
@@ -10,10 +11,12 @@ type TaskFeedItem = { id:string; assigned_to:string; release_at:string; is_relea
 const cards=[
   ["Kammer","Nachrichten, Bilder, Videos und Aufgaben", "/kammer","✦"],
   ["Kalender","Studio-Zeiten, Sessions und Termine", "/kalender","◷"],
-  ["Aufgaben","Aufgaben erstellen und Nachweise prüfen", "/aufgaben","✓"],
-  ["Keuschhaltung","Status, Check-ins und Vereinbarungen", "/keuschhaltung","◇"]
+  ["Aufgaben","Aufgaben erstellen, Vorlagen und Nachweise", "/aufgaben","✓"],
+  ["Mitglieder","Sub-Akten, Verlauf und House-Mitglieder", "/mitglieder","◎"],
+  ["Keuschhaltung","Status, Check-ins und Vereinbarungen", "/keuschhaltung","◇"],
+  ["Kassenbuch","Einnahmen, Ausgaben und Monatsübersicht", "/kassenbuch","€"]
 ] as const;
-const activity=["Neue Nachrichten prüfen","Heutige Studio-Zeiten ansehen","Offene Aufgaben kontrollieren","House-Einstellungen verwalten"];
+const activity=["Neue Nachrichten prüfen","Heutige Studio-Zeiten ansehen","Offene Aufgaben kontrollieren","Sub-Akten ansehen"];
 
 function splitCountdown(ms:number){
   const safe=Math.max(0,ms);
@@ -72,12 +75,9 @@ export default function DashboardPage(){
         <h1>{nextTask?"Bis zur nächsten Aufgabe":"Keine Aufgabe geplant"}</h1>
         {nextTask?<>
           <div className="countdownClock" aria-label={`Noch ${countdown.days} Tage ${countdown.hours} Stunden ${countdown.minutes} Minuten ${countdown.seconds} Sekunden`}>
-            <div><strong>{String(countdown.days).padStart(2,"0")}</strong><span>TAGE</span></div>
-            <b>:</b>
-            <div><strong>{String(countdown.hours).padStart(2,"0")}</strong><span>STD</span></div>
-            <b>:</b>
-            <div><strong>{String(countdown.minutes).padStart(2,"0")}</strong><span>MIN</span></div>
-            <b>:</b>
+            <div><strong>{String(countdown.days).padStart(2,"0")}</strong><span>TAGE</span></div><b>:</b>
+            <div><strong>{String(countdown.hours).padStart(2,"0")}</strong><span>STD</span></div><b>:</b>
+            <div><strong>{String(countdown.minutes).padStart(2,"0")}</strong><span>MIN</span></div><b>:</b>
             <div><strong>{String(countdown.seconds).padStart(2,"0")}</strong><span>SEK</span></div>
           </div>
           <p className="countdownRelease">Freigabe: {releaseLabel}</p>
@@ -95,9 +95,10 @@ export default function DashboardPage(){
   }
 
   return <main className="commandDashboard">
-    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Die wichtigsten Bereiche an einem Ort. Weniger Menüs, weniger Suchen, mehr direkter Zugriff.</p></div><div className="commandSeal"><span>H</span><small>PRIVATE HOUSE OS</small></div></header>
-    <section className="commandStrip"><Link href="/kammer"><span>Nachrichten</span><strong>Öffnen</strong></Link><Link href="/kalender"><span>Heute</span><strong>Kalender</strong></Link><Link href="/house"><span>House</span><strong>Zentrale</strong></Link><Link href="/discover"><span>Community</span><strong>Discover</strong></Link></section>
+    <header className="commandHero"><div><span className="commandEyebrow">HOUSE OF DOMS · COMMAND CENTER</span><h1>Dein House.<br/><em>Alles unter Kontrolle.</em></h1><p>Live-Zahlen, Mitglieder, Aufgaben, Sessions und Finanzen an einem Ort.</p></div><div className="commandSeal"><span>H</span><small>PRIVATE HOUSE OS</small></div></header>
+    {!loading && <DomLiveMetrics/>}
+    <section className="commandStrip"><Link href="/kammer"><span>Nachrichten</span><strong>Öffnen</strong></Link><Link href="/kalender"><span>Heute</span><strong>Kalender</strong></Link><Link href="/mitglieder"><span>House</span><strong>Sub-Akten</strong></Link><Link href="/discover"><span>Community</span><strong>Discover</strong></Link></section>
     <section className="commandGrid">{cards.map(([title,text,href,icon])=><Link className="commandCard" href={href} key={href}><i>{icon}</i><div><span>DIREKTZUGRIFF</span><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}</section>
-    <section className="commandLower"><article><span className="commandEyebrow">HEUTE</span><h2>Was als Nächstes ansteht</h2>{activity.map((x,i)=><Link key={x} href={["/kammer","/kalender","/aufgaben","/house-einstellungen"][i]}><em>0{i+1}</em><span>{x}</span><b>→</b></Link>)}</article><article className="housePortal"><span className="commandEyebrow">DEIN HOUSE</span><h2>Alle Werkzeuge.<br/>Eine Zentrale.</h2><p>Mitglieder, Journal, Tribute, Studio, Homepage, Store, Keuschhaltung und Einstellungen liegen gesammelt im House-Bereich.</p><Link href="/house">House öffnen →</Link></article></section>
+    <section className="commandLower"><article><span className="commandEyebrow">HEUTE</span><h2>Was als Nächstes ansteht</h2>{activity.map((x,i)=><Link key={x} href={["/kammer","/kalender","/aufgaben","/mitglieder"][i]}><em>0{i+1}</em><span>{x}</span><b>→</b></Link>)}</article><article className="housePortal"><span className="commandEyebrow">DEIN HOUSE</span><h2>Alle Werkzeuge.<br/>Eine Zentrale.</h2><p>Mitglieder, Journal, Tribute, Studio, Homepage, Store, Keuschhaltung, Kassenbuch und Einstellungen liegen gesammelt im House-Bereich.</p><Link href="/house">House öffnen →</Link></article></section>
   </main>;
 }
