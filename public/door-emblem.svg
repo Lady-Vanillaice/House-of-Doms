@@ -1,11 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="House of Doms">
-  <defs>
-    <radialGradient id="bg" cx="50%" cy="38%" r="72%"><stop offset="0" stop-color="#1b120b"/><stop offset="1" stop-color="#050403"/></radialGradient>
-  </defs>
-  <rect width="512" height="512" rx="104" fill="url(#bg)"/>
-  <rect x="18" y="18" width="476" height="476" rx="90" fill="none" stroke="#6f4a23" stroke-width="5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="House of Doms emblem">
   <g fill="none" stroke="#d6a756" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="256" cy="256" r="164" stroke-width="14"/>
+    <circle cx="256" cy="256" r="164" stroke-width="14" opacity=".95"/>
     <path d="M256 72l28 40 48-7 10 47 45 19-20 43 29 38-36 31 9 48-47 12-17 46-45-19-40 28-29-39-48 8-10-48-45-18 20-44-29-37 36-32-9-47 47-13 17-45 45 18z" stroke-width="10" opacity=".72"/>
     <path d="M174 160v192M338 160v192M174 256h164M214 160v192M298 160v192" stroke-width="14"/>
     <path d="M174 160l82 96 82-96M174 352l82-96 82 96" stroke-width="12" opacity=".92"/>
