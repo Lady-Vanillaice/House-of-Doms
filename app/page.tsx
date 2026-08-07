@@ -41,18 +41,13 @@ export default function Home() {
   function enterHouse() {
     if (entering) return;
     setEntering(true);
-    window.setTimeout(() => router.push("/anmelden"), 4200);
+    window.setTimeout(() => router.push("/anmelden"), 4600);
   }
 
   return (
     <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
       <div className="referenceBackdrop" aria-hidden="true" />
       <div className="referenceVignette" aria-hidden="true" />
-      <div className="referenceFloorMask" aria-hidden="true" />
-      <div className="referenceClosedDoors" aria-hidden="true">
-        <span className="referenceDoorLeaf referenceDoorLeafLeft"><img src="/door-emblem.svg" alt="" /></span>
-        <span className="referenceDoorLeaf referenceDoorLeafRight"><img src="/door-emblem.svg" alt="" /></span>
-      </div>
 
       <header className="referenceNav">
         <Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt="" /><span>HOUSE OF DOMS</span></Link>
