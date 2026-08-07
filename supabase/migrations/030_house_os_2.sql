@@ -1,9 +1,11 @@
 -- House of Doms — House OS 2.0
--- One consolidated expansion for dossiers, smart dashboard, task templates/series,
--- chamber linking, cashbook metadata, homepage SEO/gallery, delegated permissions,
--- and notification preferences.
+-- Consolidated upgrade: smart dashboard, Sub-Akten, task templates/series,
+-- live applications, chamber links, cashbook metadata, homepage SEO/gallery,
+-- delegated permissions and notification preferences.
 
--- TASKS: priorities, points, recurrence + templates
+-- ============================================================
+-- TASKS: priority, points, recurrence + reusable templates
+-- ============================================================
 create table if not exists public.task_templates (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles(id) on delete cascade,
@@ -35,7 +37,30 @@ do $$ begin
   end if;
 end $$;
 
+-- ============================================================
+-- LIVE HOUSE APPLICATIONS
+-- ============================================================
+create table if not exists public.house_applications (
+  id uuid primary key default gen_random_uuid(),
+  applicant_id uuid not null references public.profiles(id) on delete cascade,
+  target_dom_id uuid not null references public.profiles(id) on delete cascade,
+  house_id uuid references public.houses(id) on delete cascade,
+  subject text not null,
+  message text not null,
+  experience text not null default '',
+  availability text not null default '',
+  boundaries text not null default '',
+  status text not null default 'pending' check(status in ('pending','accepted','rejected','waitlist','withdrawn')),
+  created_at timestamptz not null default now(),
+  decided_at timestamptz,
+  updated_at timestamptz not null default now()
+);
+create index if not exists house_applications_dom_idx on public.house_applications(target_dom_id,status,created_at desc);
+create index if not exists house_applications_applicant_idx on public.house_applications(applicant_id,status,created_at desc);
+
+-- ============================================================
 -- DOM-ONLY MEMBER DOSSIER NOTES
+-- ============================================================
 create table if not exists public.house_member_notes (
   id uuid primary key default gen_random_uuid(),
   house_id uuid not null references public.houses(id) on delete cascade,
@@ -49,7 +74,9 @@ create table if not exists public.house_member_notes (
 );
 create index if not exists house_member_notes_member_idx on public.house_member_notes(house_id,member_id,created_at desc);
 
--- DELEGATED HOUSE PERMISSIONS (owner stays ultimate authority)
+-- ============================================================
+-- DELEGATED HOUSE PERMISSIONS
+-- ============================================================
 create table if not exists public.house_delegate_permissions (
   house_id uuid not null references public.houses(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -63,7 +90,9 @@ create table if not exists public.house_delegate_permissions (
   primary key(house_id,user_id)
 );
 
--- NOTIFICATION PREFERENCES: provider-independent foundation for in-app/e-mail/push later
+-- ============================================================
+-- NOTIFICATION PREFERENCES / PROVIDER-INDEPENDENT FOUNDATION
+-- ============================================================
 create table if not exists public.notification_preferences (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   in_app_enabled boolean not null default true,
@@ -79,23 +108,29 @@ create table if not exists public.notification_preferences (
   updated_at timestamptz not null default now()
 );
 
--- CHAMBER: replies, pins, booking/session links
-alter table public.messages add column if not exists reply_to_id uuid references public.messages(id) on delete set null;
-alter table public.messages add column if not exists pinned_at timestamptz;
-alter table public.messages add column if not exists linked_booking_id uuid references public.slot_bookings(id) on delete set null;
+-- ============================================================
+-- CHAMBER: reply/pin/session linking
+-- ============================================================
+alter table if exists public.messages add column if not exists reply_to_id uuid references public.messages(id) on delete set null;
+alter table if exists public.messages add column if not exists pinned_at timestamptz;
+alter table if exists public.messages add column if not exists linked_booking_id uuid references public.slot_bookings(id) on delete set null;
 
--- CASHBOOK: receipts/tax/tags
-alter table public.dom_cashbook_entries add column if not exists vat_rate numeric(5,2) not null default 0;
-alter table public.dom_cashbook_entries add column if not exists receipt_path text;
-alter table public.dom_cashbook_entries add column if not exists tags text[] not null default array[]::text[];
+-- CASHBOOK: tax, receipt, tags
+alter table if exists public.dom_cashbook_entries add column if not exists vat_rate numeric(5,2) not null default 0;
+alter table if exists public.dom_cashbook_entries add column if not exists receipt_path text;
+alter table if exists public.dom_cashbook_entries add column if not exists tags text[] not null default array[]::text[];
 
--- DOMINA HOMEPAGE: SEO, visual accent + gallery
-alter table public.domina_sites add column if not exists seo_title text;
-alter table public.domina_sites add column if not exists seo_description text;
-alter table public.domina_sites add column if not exists accent_style text not null default 'classic';
-alter table public.domina_sites add column if not exists gallery_urls text[] not null default array[]::text[];
+-- DOMINA HOMEPAGE: SEO, accent + gallery
+alter table if exists public.domina_sites add column if not exists seo_title text;
+alter table if exists public.domina_sites add column if not exists seo_description text;
+alter table if exists public.domina_sites add column if not exists accent_style text not null default 'classic';
+alter table if exists public.domina_sites add column if not exists gallery_urls text[] not null default array[]::text[];
 
+-- ============================================================
+-- RLS
+-- ============================================================
 alter table public.task_templates enable row level security;
+alter table public.house_applications enable row level security;
 alter table public.house_member_notes enable row level security;
 alter table public.house_delegate_permissions enable row level security;
 alter table public.notification_preferences enable row level security;
@@ -103,6 +138,18 @@ alter table public.notification_preferences enable row level security;
 drop policy if exists "owners manage task templates" on public.task_templates;
 create policy "owners manage task templates" on public.task_templates for all to authenticated
 using(owner_id=auth.uid()) with check(owner_id=auth.uid());
+
+drop policy if exists "application participants read" on public.house_applications;
+create policy "application participants read" on public.house_applications for select to authenticated
+using(applicant_id=auth.uid() or target_dom_id=auth.uid());
+
+drop policy if exists "applicants create applications" on public.house_applications;
+create policy "applicants create applications" on public.house_applications for insert to authenticated
+with check(applicant_id=auth.uid());
+
+drop policy if exists "application participants update" on public.house_applications;
+create policy "application participants update" on public.house_applications for update to authenticated
+using(applicant_id=auth.uid() or target_dom_id=auth.uid());
 
 drop policy if exists "house owners manage member notes" on public.house_member_notes;
 create policy "house owners manage member notes" on public.house_member_notes for all to authenticated
@@ -118,9 +165,83 @@ drop policy if exists "users manage notification preferences" on public.notifica
 create policy "users manage notification preferences" on public.notification_preferences for all to authenticated
 using(user_id=auth.uid()) with check(user_id=auth.uid());
 
-grant select,insert,update,delete on public.task_templates, public.house_member_notes, public.house_delegate_permissions, public.notification_preferences to authenticated;
+grant select,insert,update,delete on public.task_templates, public.house_applications, public.house_member_notes, public.house_delegate_permissions, public.notification_preferences to authenticated;
 
--- SMART DOM DASHBOARD METRICS
+-- ============================================================
+-- LIVE APPLICATION RPCS
+-- ============================================================
+create or replace function public.get_application_context()
+returns table(user_id uuid,role text)
+language sql security definer set search_path=public stable as $$
+ select p.id,p.role::text from public.profiles p where p.id=auth.uid();
+$$;
+grant execute on function public.get_application_context() to authenticated;
+
+create or replace function public.get_application_doms()
+returns table(user_id uuid,display_name text)
+language sql security definer set search_path=public stable as $$
+ select p.id,p.display_name from public.profiles p
+ where p.role::text in ('dom','domina') and p.id<>auth.uid()
+ order by lower(coalesce(p.display_name,''));
+$$;
+grant execute on function public.get_application_doms() to authenticated;
+
+create or replace function public.get_my_applications()
+returns table(id uuid,applicant_id uuid,applicant_name text,target_dom_id uuid,dom_name text,house_id uuid,subject text,message text,experience text,availability text,boundaries text,status text,created_at timestamptz)
+language sql security definer set search_path=public stable as $$
+ select a.id,a.applicant_id,coalesce(ap.display_name,'Mitglied'),a.target_dom_id,coalesce(dp.display_name,'Dom/Domina'),a.house_id,a.subject,a.message,a.experience,a.availability,a.boundaries,a.status,a.created_at
+ from public.house_applications a
+ join public.profiles ap on ap.id=a.applicant_id
+ join public.profiles dp on dp.id=a.target_dom_id
+ where a.applicant_id=auth.uid() or a.target_dom_id=auth.uid()
+ order by a.created_at desc;
+$$;
+grant execute on function public.get_my_applications() to authenticated;
+
+create or replace function public.submit_house_application(p_target_dom_id uuid,p_subject text,p_message text,p_experience text default '',p_availability text default '',p_boundaries text default '')
+returns uuid language plpgsql security definer set search_path=public as $$
+declare v_role text; v_house uuid; v_id uuid;
+begin
+ select role::text into v_role from public.profiles where id=auth.uid();
+ if v_role not in ('sub','sklave') then raise exception 'Nur Sub/Sklave kann eine Bewerbung senden.'; end if;
+ if not exists(select 1 from public.profiles p where p.id=p_target_dom_id and p.role::text in ('dom','domina')) then raise exception 'Dom/Domina nicht gefunden.'; end if;
+ select id into v_house from public.houses where owner_id=p_target_dom_id limit 1;
+ if nullif(trim(coalesce(p_subject,'')),'') is null or nullif(trim(coalesce(p_message,'')),'') is null then raise exception 'Betreff und Nachricht sind erforderlich.'; end if;
+ insert into public.house_applications(applicant_id,target_dom_id,house_id,subject,message,experience,availability,boundaries)
+ values(auth.uid(),p_target_dom_id,v_house,trim(p_subject),trim(p_message),coalesce(p_experience,''),coalesce(p_availability,''),coalesce(p_boundaries,''))
+ returning id into v_id; return v_id;
+end $$;
+grant execute on function public.submit_house_application(uuid,text,text,text,text,text) to authenticated;
+
+create or replace function public.decide_house_application(p_application_id uuid,p_status text)
+returns void language plpgsql security definer set search_path=public as $$
+declare a public.house_applications;
+begin
+ select * into a from public.house_applications where id=p_application_id and target_dom_id=auth.uid();
+ if a.id is null then raise exception 'Bewerbung nicht gefunden.'; end if;
+ if p_status not in ('accepted','rejected','waitlist') then raise exception 'Ungültige Entscheidung.'; end if;
+ update public.house_applications set status=p_status,decided_at=now(),updated_at=now() where id=a.id;
+ if p_status='accepted' then
+   if a.house_id is null then select id into a.house_id from public.houses where owner_id=auth.uid() limit 1; end if;
+   insert into public.memberships(house_id,member_id,joined_at)
+   values(a.house_id,a.applicant_id,now())
+   on conflict do nothing;
+ end if;
+end $$;
+grant execute on function public.decide_house_application(uuid,text) to authenticated;
+
+create or replace function public.withdraw_house_application(p_application_id uuid)
+returns void language plpgsql security definer set search_path=public as $$
+begin
+ update public.house_applications set status='withdrawn',updated_at=now()
+ where id=p_application_id and applicant_id=auth.uid() and status in ('pending','waitlist');
+ if not found then raise exception 'Bewerbung kann nicht zurückgezogen werden.'; end if;
+end $$;
+grant execute on function public.withdraw_house_application(uuid) to authenticated;
+
+-- ============================================================
+-- SMART DOM DASHBOARD
+-- ============================================================
 create or replace function public.get_dom_dashboard_metrics()
 returns table(
   house_id uuid,
@@ -144,17 +265,19 @@ begin
     v_house,
     (select count(*) from public.memberships m where m.house_id=v_house and m.ended_at is null),
     (select count(*) from public.messages m where m.recipient_id=auth.uid() and m.read_at is null),
-    (select count(*) from public.tasks t where t.house_id=v_house and t.status::text in ('open','planned')),
+    (select count(*) from public.tasks t where t.house_id=v_house and t.status::text='open'),
     (select count(*) from public.tasks t where t.house_id=v_house and t.status::text='submitted'),
-    (select count(*) from public.slot_bookings b join public.studio_days d on d.id=b.studio_day_id where b.house_id=v_house and b.status in ('requested','confirmed') and d.event_date>=current_date),
+    (select count(*) from public.slot_bookings b left join public.studio_days d on d.id=b.studio_day_id where b.house_id=v_house and b.status in ('requested','confirmed') and (d.event_date is null or d.event_date>=current_date)),
     (select count(*) from public.chastity_records c where c.house_id=v_house and c.status='active'),
     (select coalesce(sum(e.amount_cents),0)::bigint from public.dom_cashbook_entries e where e.owner_id=auth.uid() and e.entry_type='income' and e.status='completed' and e.payment_date>=date_trunc('month',current_date)::date),
-    (select count(*) from public.applications a where a.house_id=v_house and a.status::text in ('submitted','pending')),
+    (select count(*) from public.house_applications a where a.target_dom_id=auth.uid() and a.status='pending'),
     (select count(*) from public.domina_site_inquiries i join public.domina_sites s on s.id=i.site_id where s.owner_id=auth.uid() and i.read_at is null);
 end $$;
 grant execute on function public.get_dom_dashboard_metrics() to authenticated;
 
--- MEMBER DOSSIER LIST
+-- ============================================================
+-- MEMBER DOSSIERS
+-- ============================================================
 create or replace function public.get_house_member_dossiers()
 returns table(
   user_id uuid, display_name text, role text, joined_at timestamptz,
@@ -168,7 +291,7 @@ begin
   if v_house is null then raise exception 'Forbidden'; end if;
   return query
   select p.id,p.display_name,p.role::text,m.joined_at,
-    (select count(*) from public.tasks t where t.house_id=v_house and t.assigned_to=p.id and t.status::text in ('open','planned')),
+    (select count(*) from public.tasks t where t.house_id=v_house and t.assigned_to=p.id and t.status::text='open'),
     (select count(*) from public.tasks t where t.house_id=v_house and t.assigned_to=p.id and t.status::text='approved'),
     (select count(*) from public.tasks t where t.house_id=v_house and t.assigned_to=p.id and t.status::text='submitted'),
     (select count(*) from public.slot_bookings b where b.house_id=v_house and b.requester_id=p.id and b.status in ('confirmed','completed')),
@@ -180,7 +303,6 @@ begin
 end $$;
 grant execute on function public.get_house_member_dossiers() to authenticated;
 
--- ONE DOSSIER SUMMARY
 create or replace function public.get_member_dossier(p_member_id uuid)
 returns table(
   user_id uuid, display_name text, role text, joined_at timestamptz,
@@ -231,7 +353,9 @@ language sql security definer set search_path=public stable as $$
 $$;
 grant execute on function public.get_member_notes(uuid) to authenticated;
 
--- TASK TEMPLATE RPCs
+-- ============================================================
+-- TASK TEMPLATE RPCS
+-- ============================================================
 create or replace function public.save_task_template(
  p_title text,p_description text default '',p_required_proof_types text[] default array['text']::text[],
  p_priority text default 'normal',p_points integer default 0,p_release_delay_minutes integer default 0,
@@ -241,6 +365,7 @@ declare v_house uuid; v_id uuid;
 begin
  select h.id into v_house from public.houses h where h.owner_id=auth.uid() limit 1;
  if v_house is null then raise exception 'Nur Dom/Domina.'; end if;
+ if nullif(trim(coalesce(p_title,'')),'') is null then raise exception 'Titel fehlt.'; end if;
  insert into public.task_templates(owner_id,house_id,title,description,required_proof_types,priority,points,default_release_delay_minutes,default_due_after_minutes,recurrence_rule)
  values(auth.uid(),v_house,trim(p_title),coalesce(p_description,''),coalesce(p_required_proof_types,array['text']::text[]),case when p_priority in ('low','normal','high','critical') then p_priority else 'normal' end,greatest(0,coalesce(p_points,0)),greatest(0,coalesce(p_release_delay_minutes,0)),p_due_after_minutes,nullif(trim(coalesce(p_recurrence_rule,'')),''))
  returning id into v_id; return v_id;
@@ -262,7 +387,9 @@ begin
 end $$;
 grant execute on function public.create_task_from_template(uuid,uuid,timestamptz) to authenticated;
 
--- USER NOTIFICATION PREFS helper
+-- ============================================================
+-- NOTIFICATION PREFS HELPER
+-- ============================================================
 create or replace function public.get_my_notification_preferences()
 returns public.notification_preferences language plpgsql security definer set search_path=public as $$
 declare x public.notification_preferences;
