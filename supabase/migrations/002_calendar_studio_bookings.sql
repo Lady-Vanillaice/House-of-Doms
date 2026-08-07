@@ -1,9 +1,38 @@
 -- House of Doms: Kalender, Studio-Tage und Buchungen
+-- Diese Migration ist idempotent und kann gefahrlos erneut ausgeführt werden.
 
-create type public.calendar_event_type as enum ('task', 'studio_day', 'booking', 'personal');
-create type public.booking_status as enum ('requested', 'confirmed', 'declined', 'cancelled', 'completed');
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE t.typname = 'calendar_event_type' AND n.nspname = 'public'
+  ) THEN
+    CREATE TYPE public.calendar_event_type AS ENUM ('task', 'studio_day', 'booking', 'personal');
+  END IF;
 
-create table public.studio_days (
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_type t
+    JOIN pg_namespace n ON n.oid = t.typnamespace
+    WHERE t.typname = 'booking_status' AND n.nspname = 'public'
+  ) THEN
+    CREATE TYPE public.booking_status AS ENUM ('requested', 'confirmed', 'declined', 'cancelled', 'completed');
+  END IF;
+END
+$$;
+
+ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'task';
+ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'studio_day';
+ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'booking';
+ALTER TYPE public.calendar_event_type ADD VALUE IF NOT EXISTS 'personal';
+
+ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'requested';
+ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'confirmed';
+ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'declined';
+ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'cancelled';
+ALTER TYPE public.booking_status ADD VALUE IF NOT EXISTS 'completed';
+
+CREATE TABLE IF NOT EXISTS public.studio_days (
   id uuid primary key default gen_random_uuid(),
   house_id uuid not null references public.houses(id) on delete cascade,
   creator_id uuid not null references public.profiles(id) on delete cascade,
@@ -24,7 +53,7 @@ create table public.studio_days (
   check (ends_at > starts_at)
 );
 
-create table public.studio_slots (
+CREATE TABLE IF NOT EXISTS public.studio_slots (
   id uuid primary key default gen_random_uuid(),
   studio_day_id uuid not null references public.studio_days(id) on delete cascade,
   starts_at time not null,
@@ -36,7 +65,7 @@ create table public.studio_slots (
   check (ends_at > starts_at)
 );
 
-create table public.slot_bookings (
+CREATE TABLE IF NOT EXISTS public.slot_bookings (
   id uuid primary key default gen_random_uuid(),
   slot_id uuid not null references public.studio_slots(id) on delete cascade,
   house_id uuid not null references public.houses(id) on delete cascade,
@@ -52,7 +81,7 @@ create table public.slot_bookings (
   unique (slot_id, requester_id)
 );
 
-create table public.calendar_events (
+CREATE TABLE IF NOT EXISTS public.calendar_events (
   id uuid primary key default gen_random_uuid(),
   house_id uuid not null references public.houses(id) on delete cascade,
   owner_id uuid not null references public.profiles(id) on delete cascade,
@@ -71,95 +100,175 @@ create table public.calendar_events (
   check (ends_at is null or starts_at is null or ends_at > starts_at)
 );
 
-create index studio_days_house_date_idx on public.studio_days(house_id, event_date);
-create index studio_slots_day_idx on public.studio_slots(studio_day_id, starts_at);
-create index slot_bookings_requester_idx on public.slot_bookings(requester_id, status);
-create index calendar_events_house_date_idx on public.calendar_events(house_id, event_date);
+CREATE INDEX IF NOT EXISTS studio_days_house_date_idx ON public.studio_days(house_id, event_date);
+CREATE INDEX IF NOT EXISTS studio_slots_day_idx ON public.studio_slots(studio_day_id, starts_at);
+CREATE INDEX IF NOT EXISTS slot_bookings_requester_idx ON public.slot_bookings(requester_id, status);
+CREATE INDEX IF NOT EXISTS calendar_events_house_date_idx ON public.calendar_events(house_id, event_date);
 
-alter table public.studio_days enable row level security;
-alter table public.studio_slots enable row level security;
-alter table public.slot_bookings enable row level security;
-alter table public.calendar_events enable row level security;
+ALTER TABLE public.studio_days ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.studio_slots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.slot_bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.calendar_events ENABLE ROW LEVEL SECURITY;
 
-create policy "house members can view studio days"
-on public.studio_days for select
-using (
+DROP POLICY IF EXISTS "house members can view studio days" ON public.studio_days;
+CREATE POLICY "house members can view studio days"
+ON public.studio_days FOR SELECT
+USING (
   is_public = true
-  or exists (select 1 from public.house_memberships hm where hm.house_id = studio_days.house_id and hm.profile_id = auth.uid())
-  or creator_id = auth.uid()
+  OR creator_id = auth.uid()
+  OR EXISTS (
+    SELECT 1 FROM public.memberships m
+    WHERE m.house_id = studio_days.house_id
+      AND m.member_id = auth.uid()
+      AND m.ended_at IS NULL
+  )
 );
 
-create policy "house owners manage studio days"
-on public.studio_days for all
-using (creator_id = auth.uid())
-with check (creator_id = auth.uid());
+DROP POLICY IF EXISTS "house owners manage studio days" ON public.studio_days;
+CREATE POLICY "house owners manage studio days"
+ON public.studio_days FOR ALL
+USING (creator_id = auth.uid())
+WITH CHECK (creator_id = auth.uid());
 
-create policy "visible slots follow studio day access"
-on public.studio_slots for select
-using (exists (select 1 from public.studio_days sd where sd.id = studio_slots.studio_day_id and (sd.is_public = true or sd.creator_id = auth.uid() or exists (select 1 from public.house_memberships hm where hm.house_id = sd.house_id and hm.profile_id = auth.uid()))));
-
-create policy "studio owners manage slots"
-on public.studio_slots for all
-using (exists (select 1 from public.studio_days sd where sd.id = studio_slots.studio_day_id and sd.creator_id = auth.uid()))
-with check (exists (select 1 from public.studio_days sd where sd.id = studio_slots.studio_day_id and sd.creator_id = auth.uid()));
-
-create policy "requesters and house owners view bookings"
-on public.slot_bookings for select
-using (
-  requester_id = auth.uid()
-  or exists (select 1 from public.houses h where h.id = slot_bookings.house_id and h.owner_id = auth.uid())
+DROP POLICY IF EXISTS "visible slots follow studio day access" ON public.studio_slots;
+CREATE POLICY "visible slots follow studio day access"
+ON public.studio_slots FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM public.studio_days sd
+    WHERE sd.id = studio_slots.studio_day_id
+      AND (
+        sd.is_public = true
+        OR sd.creator_id = auth.uid()
+        OR EXISTS (
+          SELECT 1 FROM public.memberships m
+          WHERE m.house_id = sd.house_id
+            AND m.member_id = auth.uid()
+            AND m.ended_at IS NULL
+        )
+      )
+  )
 );
 
-create policy "members request available slots"
-on public.slot_bookings for insert
-with check (
-  requester_id = auth.uid()
-  and exists (select 1 from public.studio_slots ss where ss.id = slot_bookings.slot_id and ss.is_available = true)
-);
-
-create policy "requester or house owner updates booking"
-on public.slot_bookings for update
-using (
-  requester_id = auth.uid()
-  or exists (select 1 from public.houses h where h.id = slot_bookings.house_id and h.owner_id = auth.uid())
+DROP POLICY IF EXISTS "studio owners manage slots" ON public.studio_slots;
+CREATE POLICY "studio owners manage slots"
+ON public.studio_slots FOR ALL
+USING (
+  EXISTS (
+    SELECT 1 FROM public.studio_days sd
+    WHERE sd.id = studio_slots.studio_day_id
+      AND sd.creator_id = auth.uid()
+  )
 )
-with check (
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.studio_days sd
+    WHERE sd.id = studio_slots.studio_day_id
+      AND sd.creator_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "requesters and house owners view bookings" ON public.slot_bookings;
+CREATE POLICY "requesters and house owners view bookings"
+ON public.slot_bookings FOR SELECT
+USING (
   requester_id = auth.uid()
-  or exists (select 1 from public.houses h where h.id = slot_bookings.house_id and h.owner_id = auth.uid())
+  OR EXISTS (
+    SELECT 1 FROM public.houses h
+    WHERE h.id = slot_bookings.house_id
+      AND h.owner_id = auth.uid()
+  )
 );
 
-create policy "house members view calendar"
-on public.calendar_events for select
-using (
+DROP POLICY IF EXISTS "members request available slots" ON public.slot_bookings;
+CREATE POLICY "members request available slots"
+ON public.slot_bookings FOR INSERT
+WITH CHECK (
+  requester_id = auth.uid()
+  AND EXISTS (
+    SELECT 1 FROM public.studio_slots ss
+    WHERE ss.id = slot_bookings.slot_id
+      AND ss.is_available = true
+  )
+  AND EXISTS (
+    SELECT 1 FROM public.memberships m
+    WHERE m.house_id = slot_bookings.house_id
+      AND m.member_id = auth.uid()
+      AND m.ended_at IS NULL
+  )
+);
+
+DROP POLICY IF EXISTS "requester or house owner updates booking" ON public.slot_bookings;
+CREATE POLICY "requester or house owner updates booking"
+ON public.slot_bookings FOR UPDATE
+USING (
+  requester_id = auth.uid()
+  OR EXISTS (
+    SELECT 1 FROM public.houses h
+    WHERE h.id = slot_bookings.house_id
+      AND h.owner_id = auth.uid()
+  )
+)
+WITH CHECK (
+  requester_id = auth.uid()
+  OR EXISTS (
+    SELECT 1 FROM public.houses h
+    WHERE h.id = slot_bookings.house_id
+      AND h.owner_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "house members view calendar" ON public.calendar_events;
+CREATE POLICY "house members view calendar"
+ON public.calendar_events FOR SELECT
+USING (
   owner_id = auth.uid()
-  or exists (select 1 from public.house_memberships hm where hm.house_id = calendar_events.house_id and hm.profile_id = auth.uid())
+  OR EXISTS (
+    SELECT 1 FROM public.memberships m
+    WHERE m.house_id = calendar_events.house_id
+      AND m.member_id = auth.uid()
+      AND m.ended_at IS NULL
+  )
 );
 
-create policy "users manage own calendar events"
-on public.calendar_events for all
-using (owner_id = auth.uid())
-with check (owner_id = auth.uid());
+DROP POLICY IF EXISTS "users manage own calendar events" ON public.calendar_events;
+CREATE POLICY "users manage own calendar events"
+ON public.calendar_events FOR ALL
+USING (owner_id = auth.uid())
+WITH CHECK (owner_id = auth.uid());
 
-create or replace function public.generate_studio_slots(day_id uuid)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
+CREATE OR REPLACE FUNCTION public.generate_studio_slots(day_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
   studio public.studio_days;
   cursor_time time;
   slot_end time;
-begin
-  select * into studio from public.studio_days where id = day_id;
-  if studio.creator_id <> auth.uid() then raise exception 'not allowed'; end if;
-  delete from public.studio_slots where studio_day_id = day_id;
+BEGIN
+  SELECT * INTO studio FROM public.studio_days WHERE id = day_id;
+
+  IF studio.id IS NULL THEN
+    RAISE EXCEPTION 'studio day not found';
+  END IF;
+
+  IF studio.creator_id <> auth.uid() THEN
+    RAISE EXCEPTION 'not allowed';
+  END IF;
+
+  DELETE FROM public.studio_slots WHERE studio_day_id = day_id;
   cursor_time := studio.starts_at;
-  loop
+
+  LOOP
     slot_end := cursor_time + make_interval(mins => studio.slot_length_minutes);
-    exit when slot_end > studio.ends_at;
-    insert into public.studio_slots(studio_day_id, starts_at, ends_at) values(day_id, cursor_time, slot_end);
+    EXIT WHEN slot_end > studio.ends_at;
+
+    INSERT INTO public.studio_slots(studio_day_id, starts_at, ends_at)
+    VALUES(day_id, cursor_time, slot_end);
+
     cursor_time := slot_end + make_interval(mins => studio.break_minutes);
-  end loop;
-end;
+  END LOOP;
+END;
 $$;
