@@ -3,23 +3,19 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties } from "react";
-import "./entrance.css";
-import "./entrance-motion.css";
-import "./entrance-brand.css";
-import "./entrance-overlay-fix.css";
-import "./entrance-cinematic.css";
-import "./entrance-detail-rich.css";
+import "./entrance-reference.css";
 
 type Lang = "de" | "en";
 
 const copy = {
   de: {
-    discover: "Entdecken",
-    login: "Anmelden",
-    enter: "HOUSE BETRETEN",
-    hint: "Die Tür berühren, um einzutreten",
-    legal: "Nur für volljährige Personen · freiwillig · einvernehmlich · privat",
-    aria: "House of Doms Eingang",
+    home: "HOME",
+    dominas: "DOMINAS",
+    membership: "MEMBERSHIP",
+    about: "ÜBER UNS",
+    contact: "KONTAKT",
+    login: "LOGIN",
+    enter: "House betreten",
     flyingWords: [
       "DISZIPLIN", "HINGABE", "MACHT", "VERTRAUEN", "KONTROLLE", "GEHORSAM",
       "FÜHRUNG", "UNTERWERFUNG", "BINDUNG", "RITUAL", "LOYALITÄT", "ACHTSAMKEIT",
@@ -27,12 +23,13 @@ const copy = {
     ],
   },
   en: {
-    discover: "Discover",
-    login: "Login",
-    enter: "ENTER THE HOUSE",
-    hint: "Touch the door to enter",
-    legal: "Adults only · voluntary · consensual · private",
-    aria: "House of Doms entrance",
+    home: "HOME",
+    dominas: "DOMINAS",
+    membership: "MEMBERSHIP",
+    about: "ABOUT US",
+    contact: "CONTACT",
+    login: "LOGIN",
+    enter: "Enter House",
     flyingWords: [
       "DISCIPLINE", "DEVOTION", "POWER", "TRUST", "CONTROL", "OBEDIENCE",
       "GUIDANCE", "SUBMISSION", "BOND", "RITUAL", "LOYALTY", "MINDFULNESS",
@@ -63,80 +60,37 @@ export default function Home() {
   function enterHouse() {
     if (entering) return;
     setEntering(true);
-    window.setTimeout(() => router.push("/anmelden"), 3600);
+    window.setTimeout(() => router.push("/anmelden"), 4200);
   }
 
   return (
-    <main className={`luxuryEntrance${entering ? " isEntering" : ""}`}>
-      <div className="entranceStone" aria-hidden="true" />
-      <div className="wallGlow" aria-hidden="true" />
-      <div className="groundLight" aria-hidden="true" />
-      <div className="floor" aria-hidden="true" />
-      <div className="facadeCornice" aria-hidden="true" />
-      <div className="floorReflection" aria-hidden="true" />
+    <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
+      <img className="referenceBackdrop" src="/house-entrance-reference.webp" alt="" aria-hidden="true" />
+      <div className="referenceVignette" aria-hidden="true" />
 
-      <div className="entranceActions">
-        <div className="entranceLanguage" aria-label="Sprache / Language">
-          <button type="button" className={lang === "de" ? "active" : ""} onClick={() => changeLanguage("de")}>DE</button>
-          <button type="button" className={lang === "en" ? "active" : ""} onClick={() => changeLanguage("en")}>EN</button>
+      <header className="referenceNav">
+        <Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt="" /><span>HOUSE OF DOMS</span></Link>
+        <nav>
+          <Link href="/">{t.home}</Link>
+          <Link href="/discover">{t.dominas}</Link>
+          <Link href="/abonnements">{t.membership}</Link>
+          <Link href="/ueber-uns">{t.about}</Link>
+          <Link href="/kontakt">{t.contact}</Link>
+        </nav>
+        <div className="referenceNavActions">
+          <button type="button" onClick={() => changeLanguage(lang === "de" ? "en" : "de")}>{lang.toUpperCase()}</button>
+          <Link href="/anmelden">{t.login}</Link>
         </div>
-        <Link href="/discover">{t.discover}</Link>
-        <Link href="/anmelden">{t.login}</Link>
-      </div>
+      </header>
 
-      <section className="entranceScene" aria-label={t.aria}>
-        <aside className="housePlaque plaqueLeft">
-          <img className="plaqueEmblem" src="/door-emblem.svg" alt="" aria-hidden="true" />
-          <strong>HOUSE<br />OF<br />DOMS</strong>
-          <small>Discipline · Devotion · Desire</small>
-        </aside>
+      <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
+      <div className="referenceDoorGlow" aria-hidden="true" />
+      <div className="referenceEmblemGlow" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
 
-        <div className="doorTemple">
-          <div className="archGlow" aria-hidden="true" />
-          <div className="doorLight" aria-hidden="true" />
-          <div className="stonePilaster pilasterLeft" aria-hidden="true"><i/><i/><i/></div>
-          <div className="stonePilaster pilasterRight" aria-hidden="true"><i/><i/><i/></div>
-          <div className="lantern left" aria-hidden="true"><span /></div>
-          <div className="lantern right" aria-hidden="true"><span /></div>
-          <div className="arch">
-            <div className="archCrown" aria-hidden="true" />
-            <div className="transom" aria-hidden="true">
-              <span className="transomRay rayOne" /><span className="transomRay rayTwo" /><span className="transomRay rayThree" />
-              <span className="fanArc arcOne"/><span className="fanArc arcTwo"/><span className="fanArc arcThree"/>
-            </div>
-            <div className="doubleDoor">
-              <div className="doorLeaf doorLeft" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /><span className="doorMoulding"/></div>
-              <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /><span className="doorMoulding"/></div>
-              <div className="doorOrnament" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
-              <div className="handles" aria-hidden="true"><span /><span /></div>
-              <button className="enterOverlay" type="button" onClick={enterHouse} aria-label={t.enter}><span>{t.enter}</span></button>
-            </div>
-          </div>
-          <div className="steps" aria-hidden="true"><span /><span /><span /></div>
-          <div className="entryRunner" aria-hidden="true" />
-        </div>
-
-        <aside className="housePlaque plaqueRight">
-          <img className="plaqueEmblem" src="/door-emblem.svg" alt="" aria-hidden="true" />
-          <strong>HOUSE<br />OF<br />DOMS</strong>
-          <small>Discipline · Devotion · Desire</small>
-        </aside>
-
-        <div className="sideGarden leftGarden" aria-hidden="true"><span className="gardenPot"/><span className="shrub shrubTall"/><span className="shrub shrubLow"/></div>
-        <div className="sideGarden rightGarden" aria-hidden="true"><span className="gardenPot"/><span className="shrub shrubTall"/><span className="shrub shrubLow"/></div>
-        <div className="groundLamp groundLampLeft" aria-hidden="true" />
-        <div className="groundLamp groundLampRight" aria-hidden="true" />
-      </section>
-
-      <div className="entranceCopy">
-        <div className="kicker">HOUSE OF DOMS</div>
-        <h1>{lang === "de" ? "MEIN HOUSE. MEINE REGELN. MEIN KOMMANDO." : "MY HOUSE. MY RULES. MY COMMAND."}</h1>
-        <p>{t.legal}</p>
-      </div>
-      <div className="entranceHint">{t.hint}</div>
-
-      <div className="wordBurst" aria-hidden="true">
-        {t.flyingWords.map((word, index) => <span key={`${lang}-${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>{word}</span>)}
+      <div className="referenceWords" aria-hidden="true">
+        {t.flyingWords.map((word, index) => (
+          <span key={`${lang}-${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>{word}</span>
+        ))}
       </div>
     </main>
   );
