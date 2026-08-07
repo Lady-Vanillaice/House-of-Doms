@@ -5,6 +5,8 @@ import "./house.css";
 const sections=[
  ["Timeline","Alle House-Aktivitäten in einem chronologischen Strom","/timeline"],
  ["Sub-Akten","Mitglieder, Verlauf, Aufgaben, Sessions und private Notizen","/mitglieder"],
+ ["Abonnements","Membership-Pakete, Benefits, Preise und Laufzeiten verwalten","/abonnements"],
+ ["Abonnenten","Abo-Anfragen, Zahlungen und aktive Memberships prüfen","/abonnements/abonnenten"],
  ["Aufgaben","Aufgaben, Nachweise, Vorlagen und Freigaben","/aufgaben"],
  ["Aufgaben-Vorlagen","Wiederverwendbare Aufgaben und Serien vorbereiten","/aufgaben/vorlagen"],
  ["Kalender","Studio, Sessions, Handy-Kalender und Buchungen","/kalender"],
@@ -24,4 +26,4 @@ const sections=[
  ["Einstellungen","House-Regeln und Konfiguration","/house-einstellungen"]
 ] as const;
 
-export default function HouseHub(){return <main className="houseHub"><header><span className="hubEyebrow">HOUSE ZENTRALE · HOUSE OS 3</span><h1>Ein House.<br/><em>Alles verbunden.</em></h1><p>Mitglieder, Kommunikation, Aufgaben, Timeline, Kalender, Finanzen, Sicherheit und öffentliche Homepage greifen jetzt als ein System ineinander.</p></header><section className="hubGrid">{sections.map(([title,text,href],i)=><Link key={href} href={href} className="hubCard"><span>{String(i+1).padStart(2,"0")}</span><div><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}<DomCashbookCard/></section></main>}
+export default function HouseHub(){return <main className="houseHub"><header><span className="hubEyebrow">HOUSE ZENTRALE · HOUSE OS 4</span><h1>Ein House.<br/><em>Alles verbunden.</em></h1><p>Mit Memberships, Mitgliedern, Kommunikation, Aufgaben, Timeline, Kalender, Finanzen, Sicherheit und öffentlicher Homepage greift alles als ein System ineinander.</p></header><section className="hubGrid">{sections.map(([title,text,href],i)=><Link key={href} href={href} className="hubCard"><span>{String(i+1).padStart(2,"0")}</span><div><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}<DomCashbookCard/></section></main>}
