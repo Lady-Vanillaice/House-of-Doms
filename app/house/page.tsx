@@ -1,4 +1,5 @@
 import Link from "next/link";
+import DomCashbookCard from "./dom-cashbook-card";
 import "./house.css";
 
 const sections=[
@@ -14,4 +15,4 @@ const sections=[
  ["Einstellungen","House-Regeln und Konfiguration","/house-einstellungen"]
 ] as const;
 
-export default function HouseHub(){return <main className="houseHub"><header><span className="hubEyebrow">HOUSE ZENTRALE</span><h1>Ein House.<br/><em>Alle Bereiche.</em></h1><p>Hier liegt alles, was zu deinem privaten House gehört. Die obere Navigation bleibt bewusst schlank.</p></header><section className="hubGrid">{sections.map(([title,text,href],i)=><Link key={href} href={href} className="hubCard"><span>{String(i+1).padStart(2,"0")}</span><div><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}</section></main>}
+export default function HouseHub(){return <main className="houseHub"><header><span className="hubEyebrow">HOUSE ZENTRALE</span><h1>Ein House.<br/><em>Alle Bereiche.</em></h1><p>Hier liegt alles, was zu deinem privaten House gehört. Die obere Navigation bleibt bewusst schlank.</p></header><section className="hubGrid">{sections.map(([title,text,href],i)=><Link key={href} href={href} className="hubCard"><span>{String(i+1).padStart(2,"0")}</span><div><h2>{title}</h2><p>{text}</p></div><b>→</b></Link>)}<DomCashbookCard/></section></main>}
