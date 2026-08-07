@@ -16,8 +16,12 @@ export const metadata: Metadata = {
   title: "House of Doms",
   description: "Persönliche Plattform für einvernehmliche D/s-Dynamiken",
   manifest: "/manifest.webmanifest",
-  themeColor: "#7d101c",
-  icons: { icon: "/icon.svg", apple: "/icon.svg" },
+  themeColor: "#050403",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  },
   appleWebApp: { capable: true, title: "House of Doms", statusBarStyle: "black-translucent" }
 };
 
