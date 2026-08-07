@@ -9,14 +9,13 @@ type Lang = "de" | "en";
 type EventType = "task" | "studio" | "booking";
 type CalendarEvent = { id: string; date: string; start?: string; end?: string; title: string; type: EventType; status?: string };
 type StudioDay = { id: string; houseId: string; date: string; start: string; end: string; studio: string; hourlyPrice?: number };
-type Booking = { id: string; studioDayId: string; date: string; start: string; end: string; status: string };
 
 const copy = {
   de: {
-    title: "House-Kalender", subtitle: "Studio-Tage, Aufgaben und Buchungen live aus deinem House.", back: "Zurück ins House", today: "Heute", agenda: "Agenda", addStudio: "Studio-Zeitfenster eintragen", studioDate: "Datum", from: "Von", to: "Bis", studio: "Studio / Ort", price: "Preis pro Stunde (optional)", create: "Zeitfenster veröffentlichen", available: "Verfügbare Studio-Zeiten", book: "Session buchen", requested: "Angefragt", confirmed: "Bestätigt", tasks: "Aufgaben", noEvents: "Keine Einträge", filters: "Anzeigen", all: "Alles", studioDays: "Studio-Tage", bookings: "Buchungen", openTasks: "Aufgaben", bookingNote: "Notiz zur Buchung", request: "Buchungsanfrage senden", selected: "Session innerhalb des Zeitfensters wählen", legend: "Legende", domHint: "Du legst nur Datum, Studio und das verfügbare Zeitfenster fest. Die Session-Länge wählt der Sub/Sklave selbst.", subHint: "Wähle innerhalb eines freigegebenen Zeitfensters deine gewünschte Start- und Endzeit.", loading: "Kalender wird geladen …", saved: "Gespeichert.", login: "Bitte melde dich an.", noHouse: "Für dein Dom-Profil wurde noch kein House gefunden.", invalidWindow: "Die Endzeit muss nach der Startzeit liegen.", outsideWindow: "Die Session muss vollständig innerhalb des angebotenen Zeitfensters liegen.", sessionFrom: "Session von", sessionTo: "Session bis", week: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
+    title: "House-Kalender", subtitle: "Studio-Tage, Aufgaben und Buchungen live aus deinem House.", back: "Zurück ins House", today: "Heute", agenda: "Agenda", addStudio: "Studio-Zeitfenster eintragen", studioDate: "Datum", from: "Von", to: "Bis", studio: "Studio / Ort", price: "Preis pro Stunde (optional)", create: "Zeitfenster veröffentlichen", available: "Verfügbare Studio-Zeiten", book: "Session buchen", requested: "Angefragt", confirmed: "Bestätigt", tasks: "Aufgaben", noEvents: "Keine Einträge", filters: "Anzeigen", all: "Alles", studioDays: "Studio-Tage", bookings: "Buchungen", openTasks: "Aufgaben", bookingNote: "Notiz zur Buchung", request: "Buchungsanfrage senden", selected: "Session innerhalb des Zeitfensters wählen", legend: "Legende", domHint: "Du legst nur Datum, Studio und das verfügbare Zeitfenster fest. Die Session-Länge wählt der Sub/Sklave selbst.", subHint: "Wähle innerhalb eines freigegebenen Zeitfensters deine gewünschte Start- und Endzeit.", loading: "Kalender wird geladen …", saved: "Gespeichert.", login: "Bitte melde dich an.", noHouse: "Dein Dom/Domina-Profil konnte nicht vorbereitet werden.", invalidWindow: "Die Endzeit muss nach der Startzeit liegen.", outsideWindow: "Die Session muss vollständig innerhalb des angebotenen Zeitfensters liegen.", sessionFrom: "Session von", sessionTo: "Session bis", publishing: "Wird veröffentlicht …", week: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
   },
   en: {
-    title: "House Calendar", subtitle: "Studio days, tasks and bookings live from your House.", back: "Back to the House", today: "Today", agenda: "Agenda", addStudio: "Add studio availability", studioDate: "Date", from: "From", to: "To", studio: "Studio / location", price: "Price per hour (optional)", create: "Publish availability", available: "Available studio windows", book: "Book session", requested: "Requested", confirmed: "Confirmed", tasks: "Tasks", noEvents: "No entries", filters: "Show", all: "All", studioDays: "Studio days", bookings: "Bookings", openTasks: "Tasks", bookingNote: "Booking note", request: "Send booking request", selected: "Choose your session inside this window", legend: "Legend", domHint: "You only set the date, studio and available time window. The Sub chooses the session length.", subHint: "Choose your preferred start and end time inside an available window.", loading: "Loading calendar …", saved: "Saved.", login: "Please sign in.", noHouse: "No House was found for your Dom profile.", invalidWindow: "End time must be after start time.", outsideWindow: "The session must stay completely inside the offered window.", sessionFrom: "Session from", sessionTo: "Session to", week: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    title: "House Calendar", subtitle: "Studio days, tasks and bookings live from your House.", back: "Back to the House", today: "Today", agenda: "Agenda", addStudio: "Add studio availability", studioDate: "Date", from: "From", to: "To", studio: "Studio / location", price: "Price per hour (optional)", create: "Publish availability", available: "Available studio windows", book: "Book session", requested: "Requested", confirmed: "Confirmed", tasks: "Tasks", noEvents: "No entries", filters: "Show", all: "All", studioDays: "Studio days", bookings: "Bookings", openTasks: "Tasks", bookingNote: "Booking note", request: "Send booking request", selected: "Choose your session inside this window", legend: "Legend", domHint: "You only set the date, studio and available time window. The Sub chooses the session length.", subHint: "Choose your preferred start and end time inside an available window.", loading: "Loading calendar …", saved: "Saved.", login: "Please sign in.", noHouse: "Your Dom profile could not be prepared.", invalidWindow: "End time must be after start time.", outsideWindow: "The session must stay completely inside the offered window.", sessionFrom: "Session from", sessionTo: "Session to", publishing: "Publishing …", week: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
   }
 };
 
@@ -29,6 +28,7 @@ export default function CalendarPage() {
   const [lang, setLang] = useState<Lang>("de");
   const t = copy[lang];
   const [loading, setLoading] = useState(true);
+  const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState("");
   const [role, setRole] = useState("sub");
   const [userId, setUserId] = useState("");
@@ -59,7 +59,8 @@ export default function CalendarPage() {
     setUserId(user.id);
 
     const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    const currentRole = String(profile?.role || user.user_metadata?.role || "sub").toLowerCase();
+    const metadataRole = String(user.user_metadata?.role || "").toLowerCase();
+    const currentRole = metadataRole === "dom" || metadataRole === "domina" ? metadataRole : String(profile?.role || metadataRole || "sub").toLowerCase();
     setRole(currentRole);
 
     let activeHouse: string | null = null;
@@ -105,13 +106,24 @@ export default function CalendarPage() {
   const selectedStudioDays = studioDays.filter(day => day.date === selectedDate);
 
   async function createStudioDay(event: FormEvent) {
-    event.preventDefault(); setMessage("");
-    if (!isDom || !houseId || !userId || !studioName.trim()) { setMessage(t.noHouse); return; }
+    event.preventDefault();
+    setMessage("");
+    if (!isDom || !userId || !studioName.trim()) { setMessage(t.noHouse); return; }
     if (mins(studioEnd) <= mins(studioStart)) { setMessage(t.invalidWindow); return; }
+    setPublishing(true);
     const supabase = createClient();
-    const { error } = await supabase.from("studio_days").insert({ house_id: houseId, creator_id: userId, event_date: studioDate, starts_at: studioStart, ends_at: studioEnd, studio_name: studioName.trim(), slot_length_minutes: 60, break_minutes: 0, price_cents: price ? Math.round(Number(price) * 100) : null, currency: "EUR", is_public: true, booking_enabled: true });
-    if (error) { setMessage(error.message); return; }
-    setSelectedDate(studioDate); setMessage(t.saved); await loadCalendar();
+    const { error } = await supabase.rpc("publish_studio_window", {
+      p_event_date: studioDate,
+      p_starts_at: studioStart,
+      p_ends_at: studioEnd,
+      p_studio_name: studioName.trim(),
+      p_price_cents: price ? Math.round(Number(price) * 100) : null
+    });
+    setPublishing(false);
+    if (error) { setMessage(`Supabase: ${error.message}`); return; }
+    setSelectedDate(studioDate);
+    setMessage(t.saved);
+    await loadCalendar();
   }
 
   function openBooking(day: StudioDay) {
@@ -125,7 +137,7 @@ export default function CalendarPage() {
     if (mins(bookingStart) < mins(bookingDay.start) || mins(bookingEnd) > mins(bookingDay.end)) { setMessage(t.outsideWindow); return; }
     const supabase = createClient();
     const { error } = await supabase.rpc("request_studio_booking", { p_studio_day_id: bookingDay.id, p_starts_at: bookingStart, p_ends_at: bookingEnd, p_note: bookingNote.trim() || null });
-    if (error) { setMessage(error.message); return; }
+    if (error) { setMessage(`Supabase: ${error.message}`); return; }
     setBookingDay(null); setMessage(t.saved); await loadCalendar();
   }
 
@@ -136,7 +148,7 @@ export default function CalendarPage() {
       <section className="calendarStats"><article><span>{t.studioDays}</span><strong>{events.filter(e => e.type === "studio").length}</strong></article><article><span>{t.available}</span><strong>{studioDays.length}</strong></article><article><span>{t.bookings}</span><strong>{events.filter(e => e.type === "booking").length}</strong></article><article><span>{t.tasks}</span><strong>{events.filter(e => e.type === "task").length}</strong></article></section>
       <section className="calendarLayout"><div className="calendarCard"><div className="calendarToolbar"><button onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}>‹</button><h2>{monthLabel}</h2><button onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}>›</button><button className="todayButton" onClick={() => { const now = new Date(); setCursor(new Date(now.getFullYear(), now.getMonth(), 1)); setSelectedDate(toDateKey(now)); }}>{t.today}</button></div><div className="filters"><span>{t.filters}:</span>{(["all", "task", "studio", "booking"] as const).map(value => <button key={value} className={filter === value ? "activeFilter" : ""} onClick={() => setFilter(value)}>{value === "all" ? t.all : value === "task" ? t.openTasks : value === "studio" ? t.studioDays : t.bookings}</button>)}</div><div className="weekHeader">{t.week.map(day => <span key={day}>{day}</span>)}</div><div className="monthGrid">{days.map(day => { const key = toDateKey(day); const dayEvents = visibleEvents.filter(e => e.date === key); return <button key={key} className={`dayCell ${day.getMonth() !== cursor.getMonth() ? "outside" : ""} ${selectedDate === key ? "selectedDay" : ""}`} onClick={() => setSelectedDate(key)}><span className="dayNumber">{day.getDate()}</span><div className="dayEvents">{dayEvents.slice(0, 3).map(item => <span key={item.id} className={`eventPill ${item.type}`}>{item.start ? `${item.start} ` : ""}{item.title}</span>)}</div></button>; })}</div></div>
       <aside className="agendaCard"><div className="panelHead"><div><span className="eyebrow">{selectedDate}</span><h2>{t.agenda}</h2></div></div>{selectedEvents.length === 0 && selectedStudioDays.length === 0 && <p className="empty">{t.noEvents}</p>}{selectedEvents.map(event => <article className={`agendaItem ${event.type}`} key={event.id}><span>{event.start}{event.end ? `–${event.end}` : ""}</span><strong>{event.title}</strong></article>)}<h3>{t.available}</h3>{selectedStudioDays.map(day => <article className="slotRow" key={day.id}><div><strong>{day.start}–{day.end}</strong><span>{day.studio}{day.hourlyPrice != null ? ` · ${day.hourlyPrice.toFixed(2)} €/h` : ""}</span></div>{!isDom && <button onClick={() => openBooking(day)}>{t.book}</button>}</article>)}</aside></section>
-      {isDom && <section className="studioFormCard"><div><span className="eyebrow">DOM / DOMINA</span><h2>{t.addStudio}</h2><p>{t.domHint}</p></div><form onSubmit={createStudioDay} className="studioForm"><label>{t.studioDate}<input type="date" value={studioDate} onChange={e => setStudioDate(e.target.value)} required /></label><label>{t.from}<input type="time" value={studioStart} onChange={e => setStudioStart(e.target.value)} required /></label><label>{t.to}<input type="time" value={studioEnd} onChange={e => setStudioEnd(e.target.value)} required /></label><label>{t.studio}<input value={studioName} onChange={e => setStudioName(e.target.value)} required /></label><label>{t.price}<input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} /></label><button className="primaryButton">{t.create}</button></form></section>}
+      {isDom && <section className="studioFormCard"><div><span className="eyebrow">DOM / DOMINA</span><h2>{t.addStudio}</h2><p>{t.domHint}</p></div><form onSubmit={createStudioDay} className="studioForm"><label>{t.studioDate}<input type="date" value={studioDate} onChange={e => setStudioDate(e.target.value)} required /></label><label>{t.from}<input type="time" value={studioStart} onChange={e => setStudioStart(e.target.value)} required /></label><label>{t.to}<input type="time" value={studioEnd} onChange={e => setStudioEnd(e.target.value)} required /></label><label>{t.studio}<input value={studioName} onChange={e => setStudioName(e.target.value)} required /></label><label>{t.price}<input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} /></label><button className="primaryButton" disabled={publishing}>{publishing ? t.publishing : t.create}</button></form></section>}
       <section className="legend"><strong>{t.legend}</strong><span><i className="taskDot" />{t.openTasks}</span><span><i className="studioDot" />{t.studioDays}</span><span><i className="bookingDot" />{t.bookings}</span></section>
     </>}
     {bookingDay && <div className="modalBackdrop" onClick={() => setBookingDay(null)}><form className="bookingModal" onSubmit={sendBooking} onClick={e => e.stopPropagation()}><button type="button" className="close" onClick={() => setBookingDay(null)}>×</button><span className="eyebrow">{t.selected}</span><h2>{bookingDay.date} · {bookingDay.studio}</h2><p>{bookingDay.start}–{bookingDay.end}</p><label>{t.sessionFrom}<input type="time" min={bookingDay.start} max={bookingDay.end} value={bookingStart} onChange={e => setBookingStart(e.target.value)} required /></label><label>{t.sessionTo}<input type="time" min={bookingDay.start} max={bookingDay.end} value={bookingEnd} onChange={e => setBookingEnd(e.target.value)} required /></label><label>{t.bookingNote}<textarea value={bookingNote} onChange={e => setBookingNote(e.target.value)} rows={4} /></label><button className="primaryButton">{t.request}</button></form></div>}
