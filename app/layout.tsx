@@ -8,6 +8,7 @@ import CalendarNavigation from "./calendar-navigation";
 import ExperienceLayer from "./experience-layer";
 import PublicDirectoryNav from "./public-directory-nav";
 import QuickActions from "./quick-actions";
+import AuthenticatedBackRouter from "./authenticated-back-router";
 
 export const metadata: Metadata = {
   title: "House of Doms",
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de">
       <body>
+        <AuthenticatedBackRouter />
         <CalendarNavigation />
         <ExperienceLayer />
         <PublicDirectoryNav />
