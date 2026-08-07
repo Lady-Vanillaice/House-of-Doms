@@ -62,9 +62,67 @@ create or replace function public.update_my_studio_window_advanced(
 begin
  if not exists(select 1 from public.studio_days s join public.houses h on h.id=s.house_id where s.id=p_id and h.owner_id=auth.uid()) then raise exception 'Nicht erlaubt.'; end if;
  if p_ends_at<=p_starts_at then raise exception 'Ende muss nach Beginn liegen.'; end if;
+ if exists(
+   select 1 from public.studio_days s join public.houses h on h.id=s.house_id
+   where h.owner_id=auth.uid() and s.id<>p_id and s.event_date=p_event_date
+     and p_starts_at < s.ends_at and p_ends_at > s.starts_at
+ ) then raise exception 'Dieses Zeitfenster überschneidet sich mit einer bestehenden Studiozeit.'; end if;
  if coalesce(p_buffer_minutes,0)<0 or coalesce(p_buffer_minutes,0)>240 then raise exception 'Puffer muss zwischen 0 und 240 Minuten liegen.'; end if;
  update public.studio_days set event_date=p_event_date,starts_at=p_starts_at,ends_at=p_ends_at,studio_name=trim(p_studio_name),room=nullif(trim(coalesce(p_room,'')),''),is_duo=p_is_duo,duo_partner=case when p_is_duo then nullif(trim(coalesce(p_duo_partner,'')),'') end,is_content_shoot=p_is_content_shoot,internal_note=nullif(trim(coalesce(p_internal_note,'')),''),buffer_minutes=coalesce(p_buffer_minutes,45),is_hidden=p_is_hidden,is_public=not p_is_hidden,price_cents=p_price_cents,updated_at=now() where id=p_id;
 end $$;
 grant execute on function public.update_my_studio_window_advanced(uuid,date,time,time,text,text,boolean,text,boolean,text,integer,boolean,integer) to authenticated;
+
+create or replace function public.check_my_studio_window_conflicts(p_event_date date,p_starts_at time,p_ends_at time,p_exclude_id uuid default null)
+returns table(id uuid,starts_at time,ends_at time,studio_name text)
+language sql security definer set search_path=public stable as $$
+ select s.id,s.starts_at,s.ends_at,s.studio_name
+ from public.studio_days s join public.houses h on h.id=s.house_id
+ where h.owner_id=auth.uid() and s.event_date=p_event_date and (p_exclude_id is null or s.id<>p_exclude_id)
+   and p_starts_at < s.ends_at and p_ends_at > s.starts_at
+ order by s.starts_at;
+$$;
+grant execute on function public.check_my_studio_window_conflicts(date,time,time,uuid) to authenticated;
+
+-- Extend the private Apple/iPhone calendar feed with task deadlines.
+create or replace function public.get_dom_calendar_feed(p_token uuid)
+returns table(
+  event_uid text,event_kind text,title text,description text,location text,
+  event_date date,starts_at time,ends_at time,updated_at timestamptz
+)
+language sql security definer set search_path=public as $$
+  with target_house as (
+    select h.id,h.owner_id from public.houses h where h.calendar_feed_token=p_token limit 1
+  ),
+  studio_events as (
+    select 'studio-'||s.id::text,'studio'::text,
+      case when coalesce(s.is_hidden,false) then 'Studiozeit · intern' else 'Studiozeit · verfügbar' end,
+      concat_ws(E'\n',case when s.is_duo then 'Duo-Session'||case when nullif(s.duo_partner,'') is not null then ' mit '||s.duo_partner else '' end end,case when s.is_content_shoot then 'Content-Dreh' end,case when nullif(s.internal_note,'') is not null then 'Interne Notiz: '||s.internal_note end,'Puffer: '||coalesce(s.buffer_minutes,45)::text||' Min.'),
+      concat_ws(' · ',nullif(s.studio_name,''),nullif(s.room,'')),s.event_date,s.starts_at,s.ends_at,coalesce(s.updated_at,s.created_at,now())
+    from public.studio_days s join target_house h on h.id=s.house_id
+  ),
+  booking_events as (
+    select 'booking-'||b.id::text,'booking'::text,'Session · '||coalesce(nullif(p.display_name,''),'Sub/Sklave'),
+      concat_ws(E'\n',case when nullif(b.note,'') is not null then 'Notiz: '||b.note end,case when nullif(b.dom_note,'') is not null then 'Dom-Notiz: '||b.dom_note end,case when s.is_duo then 'Duo-Session'||case when nullif(s.duo_partner,'') is not null then ' mit '||s.duo_partner else '' end end,case when s.is_content_shoot then 'Content-Dreh' end),
+      concat_ws(' · ',nullif(s.studio_name,''),nullif(s.room,'')),s.event_date,b.starts_at,b.ends_at,coalesce(b.confirmed_at,b.requested_at,now())
+    from public.slot_bookings b join target_house h on h.id=b.house_id join public.studio_days s on s.id=b.studio_day_id left join public.profiles p on p.id=b.requester_id
+    where b.status in ('confirmed','completed') and b.starts_at is not null and b.ends_at is not null
+  ),
+  task_events as (
+    select 'task-'||t.id::text,'task'::text,'Aufgabe · '||t.title,
+      concat_ws(E'\n',nullif(t.description,''),'Status: '||t.status::text,'Priorität: '||coalesce(t.priority,'normal'),'Punkte: '||coalesce(t.points,0)::text),
+      'House of Doms'::text,
+      (t.due_at at time zone 'Europe/Berlin')::date,
+      (t.due_at at time zone 'Europe/Berlin')::time,
+      ((t.due_at + interval '30 minutes') at time zone 'Europe/Berlin')::time,
+      coalesce(t.updated_at,t.created_at,now())
+    from public.tasks t join target_house h on h.id=t.house_id
+    where t.due_at is not null
+  )
+  select * from studio_events
+  union all select * from booking_events
+  union all select * from task_events
+  order by event_date,starts_at;
+$$;
+grant execute on function public.get_dom_calendar_feed(uuid) to anon,authenticated;
 
 notify pgrst,'reload schema';
