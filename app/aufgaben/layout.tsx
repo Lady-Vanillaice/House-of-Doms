@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./task-interactions.css";
 
 export default function AufgabenLayout({ children }: { children: ReactNode }) {
   return <>
@@ -24,15 +25,16 @@ export default function AufgabenLayout({ children }: { children: ReactNode }) {
       if(label.dataset.uploadEnhanced) return;
       label.dataset.uploadEnhanced='1';
       var input=label.querySelector('input[type=file]'); if(!input) return;
-      var wantsImage=!!label.closest('.evidenceBox') && label.closest('.task')?.textContent?.includes('Bild');
-      var wantsVideo=!!label.closest('.evidenceBox') && label.closest('.task')?.textContent?.includes('Video');
+      var text=(label.closest('.task')?.textContent||'');
+      var wantsImage=text.includes('Bild');
+      var wantsVideo=text.includes('Video');
       var wrap=document.createElement('div'); wrap.className='uploadChoiceButtons';
       function button(text,accept){ var b=document.createElement('button'); b.type='button'; b.className='uploadChoice'; b.textContent=text; b.onclick=function(e){e.stopPropagation(); input.accept=accept; input.click();}; return b; }
       if(wantsImage) wrap.appendChild(button('🖼 Bild hinzufügen','image/*'));
       if(wantsVideo) wrap.appendChild(button('🎥 Video hinzufügen','video/*'));
       if(!wantsImage&&!wantsVideo){ wrap.appendChild(button('🖼 Bild hinzufügen','image/*')); wrap.appendChild(button('🎥 Video hinzufügen','video/*')); }
       input.classList.add('nativeEvidenceInput');
-      label.firstChild && label.removeChild(label.firstChild);
+      while(label.firstChild && label.firstChild!==input) label.removeChild(label.firstChild);
       label.insertBefore(wrap,input);
     });
   }
