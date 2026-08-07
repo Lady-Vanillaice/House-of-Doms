@@ -46,9 +46,6 @@ export default function Home() {
 
   return (
     <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
-      <div className="referenceBackdrop" aria-hidden="true" />
-      <div className="referenceVignette" aria-hidden="true" />
-
       <header className="referenceNav">
         <Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt="" /><span>HOUSE OF DOMS</span></Link>
         <nav>
@@ -57,8 +54,13 @@ export default function Home() {
         <div className="referenceNavActions"><button type="button" onClick={() => changeLanguage(lang === "de" ? "en" : "de")}>{lang.toUpperCase()}</button><Link href="/anmelden">{t.login}</Link></div>
       </header>
 
-      <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
-      <div className="referenceDoorGlow" aria-hidden="true" />
+      <div className="referenceScene">
+        <div className="referenceBackdrop" aria-hidden="true" />
+        <div className="referenceVignette" aria-hidden="true" />
+        <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
+        <div className="referenceDoorGlow" aria-hidden="true" />
+      </div>
+
       <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
     </main>
   );
