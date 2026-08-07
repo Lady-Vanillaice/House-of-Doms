@@ -11,7 +11,10 @@ const actions = [
   ["Studio-Zeit", "/kalender"],
   ["Keuschhaltung", "/keuschhaltung"],
   ["Tribute", "/tribute"],
-  ["Homepage", "/homepage-builder"]
+  ["Homepage", "/homepage-builder"],
+  ["Growth & Business", "/growth"],
+  ["Events", "/events"],
+  ["Safety Guide", "/safety"]
 ] as const;
 
 export default function QuickActions(){
