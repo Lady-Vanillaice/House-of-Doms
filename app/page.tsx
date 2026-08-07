@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import "./entrance.css";
+import "./entrance-motion.css";
 
 const flyingWords = [
   "HOUSE",
@@ -92,7 +93,7 @@ export default function Home() {
 
       <div className="wordBurst" aria-hidden="true">
         {flyingWords.map((word, index) => (
-          <span key={`${word}-${index}`} style={{ "--word-index": index } as React.CSSProperties}>
+          <span key={`${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>
             {word}
           </span>
         ))}
