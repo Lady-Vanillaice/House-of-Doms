@@ -14,6 +14,7 @@ export default function PublicDirectoryNav() {
         <Link className={pathname.startsWith("/houses") ? "active" : ""} href="/houses">Houses</Link>
         <Link className={pathname.startsWith("/store") ? "active" : ""} href="/store">Store</Link>
         <Link className={pathname.startsWith("/tribute") ? "active" : ""} href="/tribute">Tribute</Link>
+        <Link className={pathname.startsWith("/keuschhaltung") ? "active" : ""} href="/keuschhaltung">Keuschhaltung</Link>
         <Link className={pathname.startsWith("/kammer") ? "active" : ""} href="/kammer">Kammer</Link>
         <Link className={pathname.startsWith("/profil") ? "active" : ""} href="/profil">Profil</Link>
       </div>
