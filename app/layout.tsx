@@ -9,6 +9,7 @@ import ExperienceLayer from "./experience-layer";
 import PublicDirectoryNav from "./public-directory-nav";
 import QuickActions from "./quick-actions";
 import AuthenticatedBackRouter from "./authenticated-back-router";
+import DomCalendarSubscribe from "./dom-calendar-subscribe";
 
 export const metadata: Metadata = {
   title: "House of Doms",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ExperienceLayer />
         <PublicDirectoryNav />
         <QuickActions />
+        <DomCalendarSubscribe />
         {children}
       </body>
     </html>
