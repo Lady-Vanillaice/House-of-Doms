@@ -10,32 +10,12 @@ type Lang = "de" | "en";
 
 const copy = {
   de: {
-    home: "HOME",
-    dominas: "DOMINAS",
-    membership: "MEMBERSHIP",
-    about: "ÜBER UNS",
-    contact: "KONTAKT",
-    login: "LOGIN",
-    enter: "House betreten",
-    flyingWords: [
-      "DISZIPLIN", "HINGABE", "MACHT", "VERTRAUEN", "KONTROLLE", "GEHORSAM",
-      "FÜHRUNG", "UNTERWERFUNG", "BINDUNG", "RITUAL", "LOYALITÄT", "ACHTSAMKEIT",
-      "GRENZEN", "KONSENS", "VERANTWORTUNG", "INTENSITÄT", "DOMINANZ", "DEVOTION"
-    ],
+    home: "HOME", dominas: "DOMINAS", membership: "MEMBERSHIP", about: "ÜBER UNS", contact: "KONTAKT", login: "LOGIN", enter: "House betreten",
+    flyingWords: ["DISZIPLIN","HINGABE","MACHT","VERTRAUEN","KONTROLLE","GEHORSAM","FÜHRUNG","UNTERWERFUNG","BINDUNG","RITUAL","LOYALITÄT","ACHTSAMKEIT","GRENZEN","KONSENS","VERANTWORTUNG","INTENSITÄT","DOMINANZ","DEVOTION"],
   },
   en: {
-    home: "HOME",
-    dominas: "DOMINAS",
-    membership: "MEMBERSHIP",
-    about: "ABOUT US",
-    contact: "CONTACT",
-    login: "LOGIN",
-    enter: "Enter House",
-    flyingWords: [
-      "DISCIPLINE", "DEVOTION", "POWER", "TRUST", "CONTROL", "OBEDIENCE",
-      "GUIDANCE", "SUBMISSION", "BOND", "RITUAL", "LOYALTY", "MINDFULNESS",
-      "BOUNDARIES", "CONSENT", "RESPONSIBILITY", "INTENSITY", "DOMINANCE", "SURRENDER"
-    ],
+    home: "HOME", dominas: "DOMINAS", membership: "MEMBERSHIP", about: "ABOUT US", contact: "CONTACT", login: "LOGIN", enter: "Enter House",
+    flyingWords: ["DISCIPLINE","DEVOTION","POWER","TRUST","CONTROL","OBEDIENCE","GUIDANCE","SUBMISSION","BOND","RITUAL","LOYALTY","MINDFULNESS","BOUNDARIES","CONSENT","RESPONSIBILITY","INTENSITY","DOMINANCE","SURRENDER"],
   },
 } as const;
 
@@ -68,31 +48,24 @@ export default function Home() {
     <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
       <div className="referenceBackdrop" aria-hidden="true" />
       <div className="referenceVignette" aria-hidden="true" />
+      <div className="referenceFloorMask" aria-hidden="true" />
+      <div className="referenceClosedDoors" aria-hidden="true">
+        <span className="referenceDoorLeaf referenceDoorLeafLeft"><img src="/door-emblem.svg" alt="" /></span>
+        <span className="referenceDoorLeaf referenceDoorLeafRight"><img src="/door-emblem.svg" alt="" /></span>
+      </div>
 
       <header className="referenceNav">
         <Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt="" /><span>HOUSE OF DOMS</span></Link>
         <nav>
-          <Link href="/">{t.home}</Link>
-          <Link href="/discover">{t.dominas}</Link>
-          <Link href="/abonnements">{t.membership}</Link>
-          <Link href="/ueber-uns">{t.about}</Link>
-          <Link href="/kontakt">{t.contact}</Link>
+          <Link href="/">{t.home}</Link><Link href="/discover">{t.dominas}</Link><Link href="/abonnements">{t.membership}</Link><Link href="/ueber-uns">{t.about}</Link><Link href="/kontakt">{t.contact}</Link>
         </nav>
-        <div className="referenceNavActions">
-          <button type="button" onClick={() => changeLanguage(lang === "de" ? "en" : "de")}>{lang.toUpperCase()}</button>
-          <Link href="/anmelden">{t.login}</Link>
-        </div>
+        <div className="referenceNavActions"><button type="button" onClick={() => changeLanguage(lang === "de" ? "en" : "de")}>{lang.toUpperCase()}</button><Link href="/anmelden">{t.login}</Link></div>
       </header>
 
       <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
       <div className="referenceDoorGlow" aria-hidden="true" />
       <div className="referenceEmblemGlow" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
-
-      <div className="referenceWords" aria-hidden="true">
-        {t.flyingWords.map((word, index) => (
-          <span key={`${lang}-${word}-${index}`} style={{ "--word-index": index } as CSSProperties}>{word}</span>
-        ))}
-      </div>
+      <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
     </main>
   );
 }
