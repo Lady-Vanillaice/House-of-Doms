@@ -6,6 +6,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 import "./entrance.css";
 import "./entrance-motion.css";
 import "./entrance-brand.css";
+import "./entrance-overlay-fix.css";
 
 type Lang = "de" | "en";
 
