@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Sedgwick+Ave+Display&display=swap');
+
+:root{
+  --graffiti-font:"Sedgwick Ave Display","Arial Black",Impact,sans-serif;
+}
+
+html,body,
+body *,
+button,input,textarea,select,option,
+a,strong,small,span,p,h1,h2,h3,h4,h5,h6,label,em{
+  font-family:var(--graffiti-font)!important;
+}
+
+body{
+  letter-spacing:.015em;
+}
+
+h1,h2,h3,.brand,.eyebrow,.roleBadge,.primary,.enterButton,button{
+  letter-spacing:.035em;
+}
+
+input,textarea,select{
+  letter-spacing:.02em;
+}
