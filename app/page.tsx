@@ -46,12 +46,12 @@ export default function Home() {
 
   return (
     <main className={`referenceEntrance${entering ? " isEntering" : ""}`}>
-      <div className="referenceScene" aria-hidden="true">
-        <div className="referenceBackdrop" />
-        <div className="referenceVignette" />
-        <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} aria-hidden="false" />
-        <div className="referenceDoorGlow" />
-        <div className="referenceWords">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
+      <div className="referenceScene">
+        <div className="referenceBackdrop" aria-hidden="true" />
+        <div className="referenceVignette" aria-hidden="true" />
+        <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
+        <div className="referenceDoorGlow" aria-hidden="true" />
+        <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
       </div>
 
       <header className="referenceNav">
