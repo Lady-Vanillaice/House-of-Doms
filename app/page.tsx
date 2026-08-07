@@ -59,7 +59,6 @@ export default function Home() {
 
       <button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter} />
       <div className="referenceDoorGlow" aria-hidden="true" />
-      <div className="referenceEmblemGlow" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
       <div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div>
     </main>
   );
