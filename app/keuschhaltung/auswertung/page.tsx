@@ -1,0 +1,7 @@
+"use client";
+import Link from "next/link";
+import {useEffect,useState} from "react";
+import {createClient} from "../../../lib/supabase/client";
+import "./stats.css";
+type S={active_count:number;total_records:number;total_days:number;longest_days:number;okay_checkins:number;discomfort_checkins:number;emergency_checkins:number};
+export default function ChastityStats(){const[s,setS]=useState<S|null>(null),[msg,setMsg]=useState("");useEffect(()=>{(async()=>{const supabase=createClient();const{data,error}=await supabase.rpc('get_chastity_analytics');if(error)setMsg(error.message);else setS((data||[])[0]||null)})()},[]);return <main className="chStats"><header><Link href="/keuschhaltung">← Keuschhaltung</Link><span>AUSWERTUNG</span><h1>Keuschhaltungs-Statistik</h1><p>Laufzeiten und Check-ins deines Houses auf einen Blick.</p></header>{msg&&<p>{msg}</p>}{s&&<><section className="chGrid"><article><span>Aktiv</span><strong>{s.active_count}</strong></article><article><span>Zeiträume</span><strong>{s.total_records}</strong></article><article><span>Gesamtdauer</span><strong>{s.total_days} Tage</strong></article><article><span>Längster Zeitraum</span><strong>{s.longest_days} Tage</strong></article></section><section className="chGrid"><article><span>Alles okay</span><strong>{s.okay_checkins}</strong></article><article><span>Unbehagen</span><strong>{s.discomfort_checkins}</strong></article><article><span>Notfall</span><strong>{s.emergency_checkins}</strong></article></section></>}</main>}
