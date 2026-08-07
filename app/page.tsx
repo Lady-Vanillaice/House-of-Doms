@@ -15,46 +15,12 @@ const copy = {
     enter:"House betreten",
     flyingWords:["DISZIPLIN","HINGABE","MACHT","VERTRAUEN","KONTROLLE","GEHORSAM","FÜHRUNG","UNTERWERFUNG","BINDUNG","RITUAL","LOYALITÄT","ACHTSAMKEIT","GRENZEN","KONSENS","VERANTWORTUNG","INTENSITÄT","DOMINANZ","DEVOTION"],
     intro:{kicker:"HOUSE OF DOMS",title:"Mehr als ein Profil. Ein komplettes digitales House.",lead:"House of Doms verbindet Dominas und Subs in einer Plattform: entdecken, kennenlernen, organisieren, buchen, kommunizieren und bezahlen – mit klaren Rollen, privaten Bereichen und transparenten Abläufen."},
-    why:[
-      ["Dominas entdecken","Öffentliche Profile, Angebote und Verfügbarkeiten ansehen und die passende Domina über Discover finden."],
-      ["Alles an einem Ort","Nachrichten, Aufgaben, Kalender, Sessions, Abos, Zahlungen und House-Verwaltung in einem System."],
-      ["Privat & strukturiert","Öffentliche Präsentation nach außen, geschützte Bereiche und klare Abläufe nach der Anmeldung."]
-    ],
-    domina:{kicker:"FÜR DOMINAS",title:"Dein House. Deine Regeln. Deine Verwaltung.",lead:"Als Domina bekommst du eine eigene Präsenz innerhalb von House of Doms und ein Command Center für deine tägliche Arbeit. Du kannst dein Angebot präsentieren, Subs verwalten und deine Abläufe zentral organisieren.",features:[
-      ["Eigene House-Präsenz","Profil, Informationen, Angebote, Medien und deine öffentliche Darstellung an einem Ort."],
-      ["Discover & Buchbarkeit","Gefunden werden, Studiozeiten veröffentlichen und buchbare Sessions verwalten."],
-      ["Kalender & Studiozeiten","Verfügbarkeiten, Termine und Studio-Sessions planen und in deinen Kalender übernehmen."],
-      ["Nachrichten & private Kammer","Direkte Kommunikation mit Subs und strukturierte private Bereiche."],
-      ["Aufgaben & Kontrolle","Aufgaben erstellen, Fristen setzen, Fortschritt sehen und Rückmeldungen organisieren."],
-      ["Mitglieder & Sub-Akten","Mitglieder, Bewerbungen, Regeln, Notizen und relevante House-Informationen verwalten."],
-      ["Abos & digitale Angebote","Mitgliedschaften und wiederkehrende Angebote für deine Community bereitstellen."],
-      ["Finanzen & Kassenbuch","Umsätze, Sessions und Plattformaktivitäten übersichtlich nachvollziehen."]
-    ]},
-    sub:{kicker:"FÜR SUBS",title:"Finde Führung, Struktur und dein passendes House.",lead:"Als Sub kannst du Dominas entdecken, dich bewerben, Angebote buchen und nach der Aufnahme deinen persönlichen Bereich nutzen. Dort siehst du Aufgaben, Termine, Nachrichten und alles, was deine Verbindung zum House betrifft.",features:[
-      ["Discover","Dominas durchsuchen, Profile vergleichen und herausfinden, welches House zu dir passt."],
-      ["Bewerben & beitreten","Kontakt aufnehmen, Bewerbungen senden und nach Annahme dem House beitreten."],
-      ["Aufgaben & Countdown","Aktuelle Aufgaben sehen – inklusive großem Countdown bis zur nächsten Aufgabe."],
-      ["Nachrichten","Private Kommunikation innerhalb des House statt verstreuter Chats auf verschiedenen Plattformen."],
-      ["Sessions buchen","Verfügbare Studiozeiten und Sessions auswählen und buchen."],
-      ["Abonnements","Mitgliedschaften und exklusive Angebote deiner Domina abonnieren."],
-      ["Kalender","Gebuchte Sessions, Termine und House-Ereignisse übersichtlich verfolgen."],
-      ["Keuschhaltung & Regeln","Vereinbarte Bereiche wie Keuschhaltung, Regeln und Freigaben strukturiert dokumentieren."]
-    ]},
-    how:{kicker:"SO FUNKTIONIERT'S",title:"Vom ersten Blick bis ins private House.",steps:[
-      ["Entdecken","Über Discover öffentliche Domina-Profile, Angebote und Informationen ansehen."],
-      ["Account wählen","Als Domina oder Sub registrieren – die Plattform zeigt anschließend die passenden Werkzeuge für diese Rolle."],
-      ["Verbinden & organisieren","Bewerbungen, Nachrichten, Buchungen, Aufgaben, Kalender und Mitgliedschaften zentral verwalten."],
-      ["House nutzen","Nach dem Login entsteht der private Bereich für die laufende Beziehung, Sessions und House-Abläufe."]
-    ]},
-    pay:{kicker:"ZAHLUNGEN & ABGABEN",title:"Transparent, bevor Geld fließt.",lead:"Zahlungen und Plattformgebühren sollen von Anfang an klar verständlich sein. Die Domina sieht ihre Umsätze und die zugehörige Abgabe nachvollziehbar in ihrem Bereich.",fees:[
-      ["20 %","Plattform-Umsätze","Für Einnahmen, die eine Domina über House of Doms innerhalb der Plattform erzielt, werden 20 % Plattformabgabe berechnet."],
-      ["5 %","Studio-Sessions","Für Studio-Sessions gilt eine reduzierte Abgabe von 5 % auf die über die Plattform abgewickelte Session."]
-    ],note:"Vor einer Zahlung sollen Preis, Leistung und anfallende Plattformabgabe klar angezeigt werden. So wissen Domina und Sub bereits vor Abschluss, was gebucht wird und wie die Abrechnung funktioniert."},
-    trust:{kicker:"VERTRAUEN & STRUKTUR",title:"Eine Plattform für erwachsene, einvernehmliche Beziehungen.",items:[
-      ["Consent & Grenzen","Klare Absprachen, Grenzen und freiwillige Teilnahme gehören sichtbar zum Ablauf."],
-      ["Privatsphäre","Öffentlich ist nur, was öffentlich sein soll. Private House-Inhalte bleiben in geschützten Bereichen."],
-      ["Klare Rollen","Dominas und Subs erhalten unterschiedliche Oberflächen und genau die Funktionen, die für ihre Rolle relevant sind."]
-    ]},
+    why:[["Dominas entdecken","Öffentliche Profile, Angebote und Verfügbarkeiten ansehen und die passende Domina über Discover finden."],["Alles an einem Ort","Nachrichten, Aufgaben, Kalender, Sessions, Abos, Zahlungen und House-Verwaltung in einem System."],["Privat & strukturiert","Öffentliche Präsentation nach außen, geschützte Bereiche und klare Abläufe nach der Anmeldung."]],
+    domina:{kicker:"FÜR DOMINAS",title:"Dein House. Deine Regeln. Deine Verwaltung.",lead:"Als Domina bekommst du eine eigene Präsenz innerhalb von House of Doms und ein Command Center für deine tägliche Arbeit. Du kannst dein Angebot präsentieren, Subs verwalten und deine Abläufe zentral organisieren.",features:[["Eigene House-Präsenz","Profil, Informationen, Angebote, Medien und deine öffentliche Darstellung an einem Ort."],["Discover & Buchbarkeit","Gefunden werden, Studiozeiten veröffentlichen und buchbare Sessions verwalten."],["Kalender & Studiozeiten","Verfügbarkeiten, Termine und Studio-Sessions planen und in deinen Kalender übernehmen."],["Nachrichten & private Kammer","Direkte Kommunikation mit Subs und strukturierte private Bereiche."],["Aufgaben & Kontrolle","Aufgaben erstellen, Fristen setzen, Fortschritt sehen und Rückmeldungen organisieren."],["Mitglieder & Sub-Akten","Mitglieder, Bewerbungen, Regeln, Notizen und relevante House-Informationen verwalten."],["Abos & digitale Angebote","Mitgliedschaften und wiederkehrende Angebote für deine Community bereitstellen."],["Finanzen & Kassenbuch","Umsätze, Sessions und Plattformaktivitäten übersichtlich nachvollziehen."]]},
+    sub:{kicker:"FÜR SUBS",title:"Finde Führung, Struktur und dein passendes House.",lead:"Als Sub kannst du Dominas entdecken, dich bewerben, Angebote buchen und nach der Aufnahme deinen persönlichen Bereich nutzen. Dort siehst du Aufgaben, Termine, Nachrichten und alles, was deine Verbindung zum House betrifft.",features:[["Discover","Dominas durchsuchen, Profile vergleichen und herausfinden, welches House zu dir passt."],["Bewerben & beitreten","Kontakt aufnehmen, Bewerbungen senden und nach Annahme dem House beitreten."],["Aufgaben & Countdown","Aktuelle Aufgaben sehen – inklusive großem Countdown bis zur nächsten Aufgabe."],["Nachrichten","Private Kommunikation innerhalb des House statt verstreuter Chats auf verschiedenen Plattformen."],["Sessions buchen","Verfügbare Studiozeiten und Sessions auswählen und buchen."],["Abonnements","Mitgliedschaften und exklusive Angebote deiner Domina abonnieren."],["Kalender","Gebuchte Sessions, Termine und House-Ereignisse übersichtlich verfolgen."],["Keuschhaltung & Regeln","Vereinbarte Bereiche wie Keuschhaltung, Regeln und Freigaben strukturiert dokumentieren."]]},
+    how:{kicker:"SO FUNKTIONIERT'S",title:"Vom ersten Blick bis ins private House.",steps:[["Entdecken","Über Discover öffentliche Domina-Profile, Angebote und Informationen ansehen."],["Account wählen","Als Domina oder Sub registrieren – die Plattform zeigt anschließend die passenden Werkzeuge für diese Rolle."],["Verbinden & organisieren","Bewerbungen, Nachrichten, Buchungen, Aufgaben, Kalender und Mitgliedschaften zentral verwalten."],["House nutzen","Nach dem Login entsteht der private Bereich für die laufende Beziehung, Sessions und House-Abläufe."]]},
+    pay:{kicker:"ZAHLUNGEN & ABGABEN",title:"Transparent, bevor Geld fließt.",lead:"House of Doms trennt Abonnements, Tribute, Medien, Online-Sessions, Studio-Sessions und optionale Homepage-Leistungen klar voneinander. Das komplette Modell bleibt auf der Startseite bewusst kompakt.",teaserTitle:"Das komplette Gebührenmodell",teaserText:"Alle Prozentsätze, die Homepage-Gebühr, Zahlungsanbieter-Kosten und Umsatzstufen übersichtlich auf einer eigenen Seite ansehen.",button:"GEBÜHRENMODELL ANSEHEN"},
+    trust:{kicker:"VERTRAUEN & STRUKTUR",title:"Eine Plattform für erwachsene, einvernehmliche Beziehungen.",items:[["Consent & Grenzen","Klare Absprachen, Grenzen und freiwillige Teilnahme gehören sichtbar zum Ablauf."],["Privatsphäre","Öffentlich ist nur, was öffentlich sein soll. Private House-Inhalte bleiben in geschützten Bereichen."],["Klare Rollen","Dominas und Subs erhalten unterschiedliche Oberflächen und genau die Funktionen, die für ihre Rolle relevant sind."]]},
     cta:{kicker:"DEIN EINTRITT",title:"Entdecke das House – oder baue dein eigenes darin auf.",lead:"Du kannst zuerst Dominas entdecken oder direkt den passenden Account für deine Rolle erstellen.",domina:"ALS DOMINA STARTEN",sub:"ALS SUB BEITRETEN",discover:"DOMINAS ENTDECKEN"}
   },
   en: {
@@ -66,7 +32,7 @@ const copy = {
     domina:{kicker:"FOR DOMMES",title:"Your House. Your rules. Your command centre.",lead:"As a Domme you receive your own presence inside House of Doms plus a command centre for daily operations. Present your work, manage subs and organise everything centrally.",features:[["Your own House presence","Profile, information, offers, media and public presentation in one place."],["Discover & booking","Be found, publish studio availability and manage bookable sessions."],["Calendar & studio time","Plan availability, appointments and studio sessions and sync them to your calendar."],["Messages & private chamber","Direct communication with subs and structured private areas."],["Tasks & control","Create tasks, set deadlines, track progress and organise feedback."],["Members & sub files","Manage members, applications, rules, notes and relevant House information."],["Subscriptions & offers","Provide memberships and recurring offers for your community."],["Finances & cashbook","Track revenue, sessions and platform activity in one place."]]},
     sub:{kicker:"FOR SUBS",title:"Find guidance, structure and the right House.",lead:"As a sub you can discover Dommes, apply, book offers and use your personal area after joining. It contains tasks, appointments, messages and everything related to your House connection.",features:[["Discover","Browse Dommes, compare profiles and find the House that fits you."],["Apply & join","Make contact, send an application and join the House after acceptance."],["Tasks & countdown","See current tasks including a large countdown to the next task."],["Messages","Private communication inside the House instead of scattered external chats."],["Book sessions","Choose and book available studio times and sessions."],["Subscriptions","Subscribe to memberships and exclusive offers from your Domme."],["Calendar","Keep booked sessions, appointments and House events organised."],["Chastity & rules","Document agreed areas such as chastity, rules and permissions in a structured way."]]},
     how:{kicker:"HOW IT WORKS",title:"From first look to the private House.",steps:[["Discover","Browse public Domme profiles, offers and information through Discover."],["Choose your account","Register as Domme or sub and receive the tools designed for that role."],["Connect & organise","Manage applications, messages, bookings, tasks, calendars and memberships centrally."],["Use your House","After login the private area becomes the centre for relationships, sessions and House workflows."]]},
-    pay:{kicker:"PAYMENTS & FEES",title:"Transparent before money moves.",lead:"Payments and platform fees should be clear from the beginning. Dommes can track revenue and the applicable fee inside their account.",fees:[["20%","Platform revenue","Revenue earned by a Domme through House of Doms inside the platform is subject to a 20% platform fee."],["5%","Studio sessions","Studio sessions use a reduced 5% fee on sessions processed through the platform."]],note:"Before payment, price, service and applicable platform fee should be shown clearly so both sides know exactly what is being booked and how settlement works."},
+    pay:{kicker:"PAYMENTS & FEES",title:"Transparent before money moves.",lead:"House of Doms clearly separates subscriptions, tributes, media, online sessions, studio sessions and optional homepage services. The homepage deliberately keeps the model compact.",teaserTitle:"The complete fee model",teaserText:"View all percentages, the homepage fee, payment provider costs and revenue tiers on a dedicated page.",button:"VIEW FEE MODEL"},
     trust:{kicker:"TRUST & STRUCTURE",title:"A platform for adult, consensual relationships.",items:[["Consent & boundaries","Clear agreements, boundaries and voluntary participation are visible parts of the process."],["Privacy","Only intended public information is public. Private House content stays protected."],["Clear roles","Dommes and subs receive different interfaces with the tools relevant to their role."]]},
     cta:{kicker:"YOUR ENTRY",title:"Discover the House – or build your own inside it.",lead:"Start by discovering Dommes or create the account that matches your role.",domina:"START AS DOMME",sub:"JOIN AS SUB",discover:"DISCOVER DOMMES"}
   }
@@ -77,38 +43,23 @@ export default function Home(){
   const [entering,setEntering]=useState(false);
   const [lang,setLang]=useState<Lang>("de");
   const t=copy[lang];
-
   useEffect(()=>{const stored=window.localStorage.getItem("house-language");const initial:Lang=stored==="en"||stored==="de"?stored:navigator.language.toLowerCase().startsWith("en")?"en":"de";setLang(initial);document.documentElement.lang=initial},[]);
   function changeLanguage(next:Lang){setLang(next);window.localStorage.setItem("house-language",next);document.documentElement.lang=next}
   function enterHouse(){if(entering)return;setEntering(true);window.setTimeout(()=>router.push("/anmelden"),4600)}
-
   return <main className="publicLanding">
     <section className={`referenceEntrance${entering?" isEntering":""}`}>
-      <header className="referenceNav">
-        <Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt=""/><span>HOUSE OF DOMS</span></Link>
-        <nav>
-          <Link href="/discover">{t.nav.discover}</Link><a href="#domina">{t.nav.domina}</a><a href="#sub">{t.nav.sub}</a><a href="#how">{t.nav.how}</a><a href="#payments">{t.nav.pay}</a>
-        </nav>
-        <div className="referenceNavActions"><button type="button" onClick={()=>changeLanguage(lang==="de"?"en":"de")}>{lang.toUpperCase()}</button><Link href="/anmelden">{t.nav.login}</Link></div>
-      </header>
+      <header className="referenceNav"><Link href="/" className="referenceBrand"><img src="/door-emblem.svg" alt=""/><span>HOUSE OF DOMS</span></Link><nav><Link href="/discover">{t.nav.discover}</Link><a href="#domina">{t.nav.domina}</a><a href="#sub">{t.nav.sub}</a><a href="#how">{t.nav.how}</a><a href="#payments">{t.nav.pay}</a></nav><div className="referenceNavActions"><button type="button" onClick={()=>changeLanguage(lang==="de"?"en":"de")}>{lang.toUpperCase()}</button><Link href="/anmelden">{t.nav.login}</Link></div></header>
       <nav className="marketingMobileNav" aria-label="Öffentliche Bereiche"><Link href="/discover">{t.nav.discover}</Link><a href="#domina">{t.nav.domina}</a><a href="#sub">{t.nav.sub}</a><a href="#how">{t.nav.how}</a><a href="#payments">{t.nav.pay}</a></nav>
       <div className="referenceScene"><div className="referenceBackdrop" aria-hidden="true"/><div className="referenceVignette" aria-hidden="true"/><button className="referenceDoorHotspot" type="button" onClick={enterHouse} aria-label={t.enter}/><div className="referenceDoorGlow" aria-hidden="true"/><div className="referenceWords" aria-hidden="true">{t.flyingWords.map((word,index)=><span key={`${lang}-${word}-${index}`} style={{"--word-index":index} as CSSProperties}>{word}</span>)}</div></div>
     </section>
-
     <div className="marketingBody">
       <section className="marketingSection marketingIntro" id="discover-info"><div><span className="marketingKicker">{t.intro.kicker}</span><h2>{t.intro.title}</h2><p className="marketingLead">{t.intro.lead}</p></div><div className="marketingIntroActions"><Link className="marketingButton primary" href="/discover">{t.cta.discover}</Link><Link className="marketingButton" href="/anmelden">{t.nav.login}</Link></div></section>
       <section className="marketingSection"><span className="marketingKicker">DISCOVER · CONNECT · COMMAND</span><div className="marketingGrid">{t.why.map(([title,text])=><article className="marketingCard" key={title}><strong>{title}</strong><p>{text}</p></article>)}</div></section>
-
       <section className="marketingSection roleSection" id="domina"><div className="roleHead"><div><span className="marketingKicker">{t.domina.kicker}</span><h2>{t.domina.title}</h2></div><p className="marketingLead">{t.domina.lead}</p></div><div className="roleFeatures">{t.domina.features.map(([title,text])=><article className="roleFeature" key={title}><b>{title}</b><span>{text}</span></article>)}</div></section>
-
       <section className="marketingSection roleSection" id="sub"><div className="roleHead"><div><span className="marketingKicker">{t.sub.kicker}</span><h2>{t.sub.title}</h2></div><p className="marketingLead">{t.sub.lead}</p></div><div className="roleFeatures">{t.sub.features.map(([title,text])=><article className="roleFeature" key={title}><b>{title}</b><span>{text}</span></article>)}</div></section>
-
       <section className="marketingSection roleSection" id="how"><span className="marketingKicker">{t.how.kicker}</span><h2>{t.how.title}</h2><div className="workflow">{t.how.steps.map(([title,text])=><article key={title}><b>{title}</b><p>{text}</p></article>)}</div></section>
-
-      <section className="marketingSection roleSection" id="payments"><span className="marketingKicker">{t.pay.kicker}</span><h2>{t.pay.title}</h2><p className="marketingLead">{t.pay.lead}</p><div className="feeGrid">{t.pay.fees.map(([value,title,text])=><article className="feeCard" key={title}><span className="feeValue">{value}</span><h3>{title}</h3><p>{text}</p></article>)}</div><div className="feeNote">{t.pay.note}</div></section>
-
+      <section className="marketingSection roleSection" id="payments"><span className="marketingKicker">{t.pay.kicker}</span><h2>{t.pay.title}</h2><p className="marketingLead">{t.pay.lead}</p><div className="feeTeaser"><div><strong>{t.pay.teaserTitle}</strong><p>{t.pay.teaserText}</p></div><Link className="marketingButton primary feeModelLink" href="/gebuehrenmodell">{t.pay.button}</Link></div></section>
       <section className="marketingSection roleSection"><span className="marketingKicker">{t.trust.kicker}</span><h2>{t.trust.title}</h2><div className="trustStrip">{t.trust.items.map(([title,text])=><article key={title}><b>{title}</b><p>{text}</p></article>)}</div></section>
-
       <section className="marketingSection marketingCta"><span className="marketingKicker">{t.cta.kicker}</span><h2>{t.cta.title}</h2><p className="marketingLead">{t.cta.lead}</p><div className="marketingIntroActions"><Link className="marketingButton primary" href="/anmelden?rolle=domina">{t.cta.domina}</Link><Link className="marketingButton" href="/anmelden?rolle=sub">{t.cta.sub}</Link><Link className="marketingButton" href="/discover">{t.cta.discover}</Link></div></section>
       <footer className="marketingFooter">HOUSE OF DOMS · 18+ · CONSENT · PRIVACY · STRUCTURE</footer>
     </div>
