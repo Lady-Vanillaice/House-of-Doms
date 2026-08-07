@@ -73,8 +73,8 @@ export default function CalendarPage() {
     }
     setHouseId(activeHouse);
 
-    const { data: days, error: dayError } = await supabase.from("studio_days").select("id,house_id,event_date,starts_at,ends_at,studio_name,price_cents").order("event_date", { ascending: true });
-    if (dayError) setMessage(dayError.message);
+    const { data: days, error: dayError } = await supabase.rpc("get_visible_studio_windows");
+    if (dayError) setMessage(`Supabase: ${dayError.message}`);
     const nextDays: StudioDay[] = (days || []).map((day: any) => ({ id: day.id, houseId: day.house_id, date: day.event_date, start: trimTime(day.starts_at), end: trimTime(day.ends_at), studio: day.studio_name, hourlyPrice: day.price_cents == null ? undefined : day.price_cents / 100 }));
     setStudioDays(nextDays);
 
