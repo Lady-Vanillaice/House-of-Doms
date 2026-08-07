@@ -3,6 +3,7 @@ import "./globals.css";
 import "./alpha.css";
 import "./experience-layer.css";
 import "./red-gold-theme.css";
+import "./graffiti-font.css";
 import CalendarNavigation from "./calendar-navigation";
 import ExperienceLayer from "./experience-layer";
 import PublicDirectoryNav from "./public-directory-nav";
