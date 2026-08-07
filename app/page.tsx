@@ -7,6 +7,7 @@ import "./entrance.css";
 import "./entrance-motion.css";
 import "./entrance-brand.css";
 import "./entrance-overlay-fix.css";
+import "./entrance-cinematic.css";
 
 type Lang = "de" | "en";
 
@@ -18,7 +19,11 @@ const copy = {
     hint: "Die Tür berühren, um einzutreten",
     legal: "Nur für volljährige Personen · freiwillig · einvernehmlich · privat",
     aria: "House of Doms Eingang",
-    flyingWords: ["MEIN HOUSE","MEINE REGELN","MEIN KOMMANDO","PRIVATE KAMMER","AUFGABEN","JOURNAL","HOUSE STORE","KALENDER","BEWERBUNGEN","HOUSE-EINSTELLUNGEN","HOUSE-SCHLÜSSEL","WILLKOMMEN ZU HAUSE"],
+    flyingWords: [
+      "DISZIPLIN", "HINGABE", "MACHT", "VERTRAUEN", "KONTROLLE", "GEHORSAM",
+      "FÜHRUNG", "UNTERWERFUNG", "BINDUNG", "RITUAL", "LOYALITÄT", "ACHTSAMKEIT",
+      "GRENZEN", "KONSENS", "VERANTWORTUNG", "INTENSITÄT", "DOMINANZ", "DEVOTION"
+    ],
   },
   en: {
     discover: "Discover",
@@ -27,7 +32,11 @@ const copy = {
     hint: "Touch the door to enter",
     legal: "Adults only · voluntary · consensual · private",
     aria: "House of Doms entrance",
-    flyingWords: ["MY HOUSE","MY RULES","MY COMMAND","PRIVATE CHAMBER","TASKS","JOURNAL","HOUSE STORE","CALENDAR","APPLICATIONS","HOUSE SETTINGS","HOUSE KEY","WELCOME HOME"],
+    flyingWords: [
+      "DISCIPLINE", "DEVOTION", "POWER", "TRUST", "CONTROL", "OBEDIENCE",
+      "GUIDANCE", "SUBMISSION", "BOND", "RITUAL", "LOYALTY", "MINDFULNESS",
+      "BOUNDARIES", "CONSENT", "RESPONSIBILITY", "INTENSITY", "DOMINANCE", "SURRENDER"
+    ],
   },
 } as const;
 
@@ -53,7 +62,7 @@ export default function Home() {
   function enterHouse() {
     if (entering) return;
     setEntering(true);
-    window.setTimeout(() => router.push("/anmelden"), 1250);
+    window.setTimeout(() => router.push("/anmelden"), 3600);
   }
 
   return (
