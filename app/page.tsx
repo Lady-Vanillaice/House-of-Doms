@@ -5,7 +5,9 @@ export default function Home() {
   return (
     <main className="luxuryEntrance">
       <div className="entranceStone" aria-hidden="true" />
+      <div className="wallGlow" aria-hidden="true" />
       <div className="groundLight" aria-hidden="true" />
+      <div className="floor" aria-hidden="true" />
 
       <div className="entranceActions">
         <Link href="/discover">Discover</Link>
@@ -13,32 +15,41 @@ export default function Home() {
       </div>
 
       <section className="entranceScene" aria-label="House of Doms Eingang">
-        <aside className="housePlaque" aria-hidden="true">
-          <div className="sigil"><span>H</span></div>
+        <aside className="housePlaque plaqueLeft">
+          <div className="plaqueSigil" aria-hidden="true"><span>H</span></div>
           <strong>HOUSE<br />OF<br />DOMS</strong>
           <small>Discipline · Devotion · Desire</small>
         </aside>
 
         <div className="doorTemple">
           <div className="archGlow" aria-hidden="true" />
-          <div className="lantern left" aria-hidden="true" />
-          <div className="lantern right" aria-hidden="true" />
+          <div className="lantern left" aria-hidden="true"><span /></div>
+          <div className="lantern right" aria-hidden="true"><span /></div>
 
           <div className="arch">
-            <div className="transom" aria-hidden="true" />
+            <div className="archCrown" aria-hidden="true" />
+            <div className="transom" aria-hidden="true">
+              <span className="transomRay rayOne" />
+              <span className="transomRay rayTwo" />
+              <span className="transomRay rayThree" />
+            </div>
+
             <div className="doubleDoor">
-              <div className="doorLeaf" aria-hidden="true" />
-              <div className="doorLeaf" aria-hidden="true" />
+              <div className="doorLeaf doorLeft" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
+              <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
               <div className="doorOrnament" aria-hidden="true">H</div>
               <div className="handles" aria-hidden="true"><span /><span /></div>
-              <Link className="enterOverlay" href="/anmelden" aria-label="House betreten">House betreten</Link>
+              <Link className="enterOverlay" href="/anmelden" aria-label="House betreten">
+                <span>HOUSE BETRETEN</span>
+              </Link>
             </div>
           </div>
-          <div className="steps" aria-hidden="true" />
+
+          <div className="steps" aria-hidden="true"><span /><span /><span /></div>
         </div>
 
-        <aside className="housePlaque" aria-hidden="true">
-          <div className="sigil"><span>H</span></div>
+        <aside className="housePlaque plaqueRight">
+          <div className="plaqueSigil" aria-hidden="true"><span>H</span></div>
           <strong>HOUSE<br />OF<br />DOMS</strong>
           <small>Discipline · Devotion · Desire</small>
         </aside>
@@ -46,10 +57,10 @@ export default function Home() {
 
       <div className="entranceCopy">
         <div className="kicker">HOUSE OF DOMS</div>
-        <h1>DEIN HOUSE. DEINE REGELN.</h1>
-        <p>Ein geschützter digitaler Raum für volljährige, einvernehmliche Dynamiken.</p>
+        <h1>DISCIPLINE. DEVOTION. DESIRE.</h1>
+        <p>Nur für volljährige Personen · freiwillig · einvernehmlich · privat</p>
       </div>
-      <div className="entranceHint">Tür berühren, um einzutreten</div>
+      <div className="entranceHint">Die Tür berühren, um einzutreten</div>
     </main>
   );
 }
