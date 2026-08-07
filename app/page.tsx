@@ -1,9 +1,37 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import "./entrance.css";
 
+const flyingWords = [
+  "HOUSE",
+  "OF",
+  "DOMS",
+  "DISCIPLINE",
+  "DEVOTION",
+  "DESIRE",
+  "DISCOVER",
+  "ANMELDEN",
+  "VOLJÄHRIG",
+  "FREIWILLIG",
+  "EINVERNEHMLICH",
+  "PRIVAT",
+];
+
 export default function Home() {
+  const router = useRouter();
+  const [entering, setEntering] = useState(false);
+
+  function enterHouse() {
+    if (entering) return;
+    setEntering(true);
+    window.setTimeout(() => router.push("/anmelden"), 1150);
+  }
+
   return (
-    <main className="luxuryEntrance">
+    <main className={`luxuryEntrance${entering ? " isEntering" : ""}`}>
       <div className="entranceStone" aria-hidden="true" />
       <div className="wallGlow" aria-hidden="true" />
       <div className="groundLight" aria-hidden="true" />
@@ -39,9 +67,9 @@ export default function Home() {
               <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
               <div className="doorOrnament" aria-hidden="true">H</div>
               <div className="handles" aria-hidden="true"><span /><span /></div>
-              <Link className="enterOverlay" href="/anmelden" aria-label="House betreten">
+              <button className="enterOverlay" type="button" onClick={enterHouse} aria-label="House betreten">
                 <span>HOUSE BETRETEN</span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -61,6 +89,14 @@ export default function Home() {
         <p>Nur für volljährige Personen · freiwillig · einvernehmlich · privat</p>
       </div>
       <div className="entranceHint">Die Tür berühren, um einzutreten</div>
+
+      <div className="wordBurst" aria-hidden="true">
+        {flyingWords.map((word, index) => (
+          <span key={`${word}-${index}`} style={{ "--word-index": index } as React.CSSProperties}>
+            {word}
+          </span>
+        ))}
+      </div>
     </main>
   );
 }
