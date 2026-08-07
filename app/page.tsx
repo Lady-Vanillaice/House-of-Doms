@@ -8,6 +8,7 @@ import "./entrance-motion.css";
 import "./entrance-brand.css";
 import "./entrance-overlay-fix.css";
 import "./entrance-cinematic.css";
+import "./entrance-detail-rich.css";
 
 type Lang = "de" | "en";
 
@@ -71,6 +72,8 @@ export default function Home() {
       <div className="wallGlow" aria-hidden="true" />
       <div className="groundLight" aria-hidden="true" />
       <div className="floor" aria-hidden="true" />
+      <div className="facadeCornice" aria-hidden="true" />
+      <div className="floorReflection" aria-hidden="true" />
 
       <div className="entranceActions">
         <div className="entranceLanguage" aria-label="Sprache / Language">
@@ -91,20 +94,26 @@ export default function Home() {
         <div className="doorTemple">
           <div className="archGlow" aria-hidden="true" />
           <div className="doorLight" aria-hidden="true" />
+          <div className="stonePilaster pilasterLeft" aria-hidden="true"><i/><i/><i/></div>
+          <div className="stonePilaster pilasterRight" aria-hidden="true"><i/><i/><i/></div>
           <div className="lantern left" aria-hidden="true"><span /></div>
           <div className="lantern right" aria-hidden="true"><span /></div>
           <div className="arch">
             <div className="archCrown" aria-hidden="true" />
-            <div className="transom" aria-hidden="true"><span className="transomRay rayOne" /><span className="transomRay rayTwo" /><span className="transomRay rayThree" /></div>
+            <div className="transom" aria-hidden="true">
+              <span className="transomRay rayOne" /><span className="transomRay rayTwo" /><span className="transomRay rayThree" />
+              <span className="fanArc arcOne"/><span className="fanArc arcTwo"/><span className="fanArc arcThree"/>
+            </div>
             <div className="doubleDoor">
-              <div className="doorLeaf doorLeft" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
-              <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /></div>
+              <div className="doorLeaf doorLeft" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /><span className="doorMoulding"/></div>
+              <div className="doorLeaf doorRight" aria-hidden="true"><span className="panelTop" /><span className="panelBottom" /><span className="doorMoulding"/></div>
               <div className="doorOrnament" aria-hidden="true"><img src="/door-emblem.svg" alt="" /></div>
               <div className="handles" aria-hidden="true"><span /><span /></div>
               <button className="enterOverlay" type="button" onClick={enterHouse} aria-label={t.enter}><span>{t.enter}</span></button>
             </div>
           </div>
           <div className="steps" aria-hidden="true"><span /><span /><span /></div>
+          <div className="entryRunner" aria-hidden="true" />
         </div>
 
         <aside className="housePlaque plaqueRight">
@@ -112,6 +121,11 @@ export default function Home() {
           <strong>HOUSE<br />OF<br />DOMS</strong>
           <small>Discipline · Devotion · Desire</small>
         </aside>
+
+        <div className="sideGarden leftGarden" aria-hidden="true"><span className="gardenPot"/><span className="shrub shrubTall"/><span className="shrub shrubLow"/></div>
+        <div className="sideGarden rightGarden" aria-hidden="true"><span className="gardenPot"/><span className="shrub shrubTall"/><span className="shrub shrubLow"/></div>
+        <div className="groundLamp groundLampLeft" aria-hidden="true" />
+        <div className="groundLamp groundLampRight" aria-hidden="true" />
       </section>
 
       <div className="entranceCopy">
