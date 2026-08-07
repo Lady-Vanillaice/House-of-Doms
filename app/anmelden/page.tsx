@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "../../lib/supabase/client";
 
-export default function AnmeldenPage() {
+function AnmeldenContent() {
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [message, setMessage] = useState("");
@@ -79,5 +79,13 @@ export default function AnmeldenPage() {
         <small>Nach erfolgreicher Anmeldung wirst du direkt zu deinem Profil weitergeleitet.</small>
       </section>
     </main>
+  );
+}
+
+export default function AnmeldenPage() {
+  return (
+    <Suspense fallback={<main className="authPage"><section className="authCard"><p>Wird geladen …</p></section></main>}>
+      <AnmeldenContent />
+    </Suspense>
   );
 }
