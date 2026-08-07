@@ -1,24 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Sedgwick+Ave+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 :root{
-  --graffiti-font:"Sedgwick Ave Display","Arial Black",Impact,sans-serif;
+  --dark-display:"Pirata One",Georgia,serif;
+  --dark-body:"Rajdhani",Inter,system-ui,sans-serif;
 }
 
 html,body,
-body *,
 button,input,textarea,select,option,
-a,strong,small,span,p,h1,h2,h3,h4,h5,h6,label,em{
-  font-family:var(--graffiti-font)!important;
+a,strong,small,span,p,label,em{
+  font-family:var(--dark-body)!important;
+}
+
+h1,h2,h3,h4,h5,h6,
+.brand,.eyebrow,.roleBadge,.doorMark,.crest,
+.houseIdentity strong,.workspaceHeader h2,.welcomeCard h3,.panel h3,.productCard h3{
+  font-family:var(--dark-display)!important;
+  letter-spacing:.025em;
 }
 
 body{
-  letter-spacing:.015em;
+  letter-spacing:.005em;
+  font-weight:500;
 }
 
-h1,h2,h3,.brand,.eyebrow,.roleBadge,.primary,.enterButton,button{
-  letter-spacing:.035em;
+p,small,label,input,textarea,select,option{
+  letter-spacing:.008em;
+  line-height:1.55;
 }
 
-input,textarea,select{
-  letter-spacing:.02em;
+button,.primary,.enterButton,.roleBadge,.brand,.eyebrow{
+  font-weight:700;
+}
+
+h1,h2,h3,h4,h5,h6{
+  font-weight:400;
 }
