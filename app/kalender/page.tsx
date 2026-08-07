@@ -1,156 +1,25 @@
 "use client";
-
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "../../lib/supabase/client";
+import {FormEvent,useCallback,useEffect,useMemo,useState} from "react";
+import {createClient} from "../../lib/supabase/client";
 import "./calendar.css";
+import "./admin-calendar.css";
 
-type Lang = "de" | "en";
-type EventType = "task" | "studio" | "booking";
-type CalendarEvent = { id: string; date: string; start?: string; end?: string; title: string; type: EventType; status?: string };
-type StudioDay = { id: string; houseId: string; date: string; start: string; end: string; studio: string; hourlyPrice?: number };
+type E={id:string;date:string;start?:string;end?:string;title:string;type:"task"|"studio"|"booking";status?:string};
+type D={id:string;house_id:string;event_date:string;starts_at:string;ends_at:string;studio_name:string;room?:string|null;is_duo?:boolean;duo_partner?:string|null;is_content_shoot?:boolean;internal_note?:string|null;buffer_minutes?:number;is_hidden?:boolean;price_cents?:number|null};
+const p=(n:number)=>String(n).padStart(2,"0"),dk=(d:Date)=>`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`,tm=(v?:string|null)=>v?v.slice(0,5):"",mins=(t:string)=>{const[a,b]=t.split(":").map(Number);return a*60+b};
 
-const copy = {
-  de: {
-    title: "House-Kalender", subtitle: "Studio-Tage, Aufgaben und Buchungen live aus deinem House.", back: "Zurück ins House", today: "Heute", agenda: "Agenda", addStudio: "Studio-Zeitfenster eintragen", studioDate: "Datum", from: "Von", to: "Bis", studio: "Studio / Ort", price: "Preis pro Stunde (optional)", create: "Zeitfenster veröffentlichen", available: "Verfügbare Studio-Zeiten", book: "Session buchen", requested: "Angefragt", confirmed: "Bestätigt", tasks: "Aufgaben", noEvents: "Keine Einträge", filters: "Anzeigen", all: "Alles", studioDays: "Studio-Tage", bookings: "Buchungen", openTasks: "Aufgaben", bookingNote: "Notiz zur Buchung", request: "Buchungsanfrage senden", selected: "Session innerhalb des Zeitfensters wählen", legend: "Legende", domHint: "Du legst nur Datum, Studio und das verfügbare Zeitfenster fest. Die Session-Länge wählt der Sub/Sklave selbst.", subHint: "Wähle innerhalb eines freigegebenen Zeitfensters deine gewünschte Start- und Endzeit.", loading: "Kalender wird geladen …", saved: "Gespeichert.", login: "Bitte melde dich an.", noHouse: "Dein Dom/Domina-Profil konnte nicht vorbereitet werden.", invalidWindow: "Die Endzeit muss nach der Startzeit liegen.", outsideWindow: "Die Session muss vollständig innerhalb des angebotenen Zeitfensters liegen.", sessionFrom: "Session von", sessionTo: "Session bis", publishing: "Wird veröffentlicht …", week: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
-  },
-  en: {
-    title: "House Calendar", subtitle: "Studio days, tasks and bookings live from your House.", back: "Back to the House", today: "Today", agenda: "Agenda", addStudio: "Add studio availability", studioDate: "Date", from: "From", to: "To", studio: "Studio / location", price: "Price per hour (optional)", create: "Publish availability", available: "Available studio windows", book: "Book session", requested: "Requested", confirmed: "Confirmed", tasks: "Tasks", noEvents: "No entries", filters: "Show", all: "All", studioDays: "Studio days", bookings: "Bookings", openTasks: "Tasks", bookingNote: "Booking note", request: "Send booking request", selected: "Choose your session inside this window", legend: "Legend", domHint: "You only set the date, studio and available time window. The Sub chooses the session length.", subHint: "Choose your preferred start and end time inside an available window.", loading: "Loading calendar …", saved: "Saved.", login: "Please sign in.", noHouse: "Your Dom profile could not be prepared.", invalidWindow: "End time must be after start time.", outsideWindow: "The session must stay completely inside the offered window.", sessionFrom: "Session from", sessionTo: "Session to", publishing: "Publishing …", week: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-  }
-};
+export default function CalendarPage(){
+ const[loading,setLoading]=useState(true),[msg,setMsg]=useState(""),[role,setRole]=useState("sub"),[uid,setUid]=useState("");
+ const[cursor,setCursor]=useState(()=>new Date(new Date().getFullYear(),new Date().getMonth(),1)),[selected,setSelected]=useState(dk(new Date())),[filter,setFilter]=useState<"all"|"task"|"studio"|"booking">("all"),[studio,setStudio]=useState<D[]>([]),[events,setEvents]=useState<E[]>([]);
+ const isDom=role==="dom"||role==="domina";
+ const load=useCallback(async()=>{setLoading(true);const s=createClient(),{data:a}=await s.auth.getUser();if(!a.user){location.href="/anmelden";return}setUid(a.user.id);const{data:pr}=await s.from("profiles").select("role").eq("id",a.user.id).maybeSingle();const r=String(pr?.role||a.user.user_metadata?.role||"sub").toLowerCase();setRole(r);const rpc=r==="dom"||r==="domina"?"get_my_studio_windows_admin":"get_visible_studio_windows_advanced";const{data:rows,error}=await s.rpc(rpc);if(error){setMsg(`Supabase: ${error.message}`);setLoading(false);return}const ds=(rows||[]) as D[];setStudio(ds);const ev:E[]=ds.map(d=>({id:`s-${d.id}`,date:d.event_date,start:tm(d.starts_at),end:tm(d.ends_at),title:`Studio · ${d.studio_name}`,type:"studio"}));const{data:b}=await s.from("slot_bookings").select("id,studio_day_id,starts_at,ends_at,status").not("studio_day_id","is",null);const m=new Map(ds.map(d=>[d.id,d]));for(const x of b||[]){const d=m.get(x.studio_day_id);if(d)ev.push({id:`b-${x.id}`,date:d.event_date,start:tm(x.starts_at),end:tm(x.ends_at),title:x.status==="confirmed"?"Bestätigte Session":"Session angefragt",type:"booking",status:x.status})}const{data:t}=await s.from("tasks").select("id,title,due_at,status").not("due_at","is",null);for(const x of t||[]){const d=new Date(x.due_at);ev.push({id:`t-${x.id}`,date:dk(d),start:`${p(d.getHours())}:${p(d.getMinutes())}`,title:x.title,type:"task",status:x.status})}setEvents(ev);setLoading(false)},[]);
+ useEffect(()=>{void load()},[load]);
+ const grid=useMemo(()=>{const f=new Date(cursor.getFullYear(),cursor.getMonth(),1),o=(f.getDay()+6)%7;return Array.from({length:42},(_,i)=>new Date(cursor.getFullYear(),cursor.getMonth(),i-o+1))},[cursor]);const shown=events.filter(e=>filter==="all"||e.type===filter),dayEvents=shown.filter(e=>e.date===selected),dayStudio=studio.filter(d=>d.event_date===selected),month=new Intl.DateTimeFormat("de-DE",{month:"long",year:"numeric"}).format(cursor);
+ return <main className="calendarPage"><header className="calendarTop"><div><Link href="/dashboard" className="backLink">← Zum Dashboard</Link><span className="eyebrow">HOUSE OF DOMS</span><h1>{isDom?"Domina-Kalender":"Buchungskalender"}</h1><p>{isDom?"Dein Admin-Kalender: Studiozeiten, Duo, Content, Puffer und interne Freigabe.":"Nur freigegebene Studiozeiten deines Houses. Start und Dauer bestimmst du innerhalb des Fensters selbst."}</p></div></header>{msg&&<p className="calendarMessage">{msg}</p>}{loading?<section className="calendarCard">Kalender wird geladen …</section>:<><section className="calendarStats"><article><span>Zeitfenster</span><strong>{studio.length}</strong></article><article><span>Buchungen</span><strong>{events.filter(e=>e.type==="booking").length}</strong></article><article><span>Aufgaben</span><strong>{events.filter(e=>e.type==="task").length}</strong></article><article><span>Modus</span><strong>{isDom?"ADMIN":"BUCHEN"}</strong></article></section><section className="calendarLayout"><div className="calendarCard"><div className="calendarToolbar"><button onClick={()=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()-1,1))}>‹</button><h2>{month}</h2><button onClick={()=>setCursor(new Date(cursor.getFullYear(),cursor.getMonth()+1,1))}>›</button><button className="todayButton" onClick={()=>{const n=new Date();setCursor(new Date(n.getFullYear(),n.getMonth(),1));setSelected(dk(n))}}>Heute</button></div><div className="filters"><span>Anzeigen:</span>{(["all","task","studio","booking"] as const).map(v=><button key={v} className={filter===v?"activeFilter":""} onClick={()=>setFilter(v)}>{v==="all"?"Alles":v==="task"?"Aufgaben":v==="studio"?"Studio":"Buchungen"}</button>)}</div><div className="weekHeader">{["Mo","Di","Mi","Do","Fr","Sa","So"].map(x=><span key={x}>{x}</span>)}</div><div className="monthGrid">{grid.map(d=>{const k=dk(d),ev=shown.filter(e=>e.date===k);return <button key={k} className={`dayCell ${d.getMonth()!==cursor.getMonth()?"outside":""} ${selected===k?"selectedDay":""}`} onClick={()=>setSelected(k)}><span className="dayNumber">{d.getDate()}</span><div className="dayEvents">{ev.slice(0,3).map(x=><span key={x.id} className={`eventPill ${x.type}`}>{x.start?`${x.start} `:""}{x.title}</span>)}</div></button>})}</div></div><aside className="agendaCard"><span className="eyebrow">{selected}</span><h2>Agenda</h2>{dayEvents.length===0&&dayStudio.length===0&&<p className="empty">Keine Einträge</p>}{dayEvents.map(e=><article className={`agendaItem ${e.type}`} key={e.id}><span>{e.start}{e.end?`–${e.end}`:""}</span><strong>{e.title}</strong></article>)}<h3>{isDom?"DEINE ZEITFENSTER":"BUCHBARE ZEITEN"}</h3>{dayStudio.map(d=>isDom?<AdminSlot key={d.id} d={d} reload={load} setMsg={setMsg}/>:<SubSlot key={d.id} d={d} uid={uid} reload={load} setMsg={setMsg}/>)}</aside></section>{isDom&&<AdminForm reload={load} setMsg={setMsg}/>}</>}</main>}
 
-const pad = (value: number) => String(value).padStart(2, "0");
-const toDateKey = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-const trimTime = (value?: string | null) => value ? value.slice(0, 5) : "";
-const mins = (time: string) => { const [h, m] = time.split(":").map(Number); return h * 60 + m; };
+function AdminForm({reload,setMsg}:{reload:()=>Promise<void>;setMsg:(x:string)=>void}){const[date,setDate]=useState(dk(new Date())),[start,setStart]=useState("18:00"),[end,setEnd]=useState("22:00"),[two,setTwo]=useState(false),[s2,setS2]=useState("23:00"),[e2,setE2]=useState("23:59"),[place,setPlace]=useState("Studio60, Gärtnerstraße 60, 80992 München"),[room,setRoom]=useState(""),[duo,setDuo]=useState(false),[partner,setPartner]=useState(""),[content,setContent]=useState(false),[note,setNote]=useState(""),[buffer,setBuffer]=useState(45),[hidden,setHidden]=useState(true),[price,setPrice]=useState(""),[saving,setSaving]=useState(false);async function submit(e:FormEvent){e.preventDefault();if(!date||!place.trim()||mins(end)<=mins(start)){setMsg("Bitte Datum, Studio und gültige Zeiten angeben.");return}setSaving(true);const s=createClient(),{error}=await s.rpc("publish_advanced_studio_window",{p_event_date:date,p_starts_at:start,p_ends_at:end,p_studio_name:place.trim(),p_room:room.trim()||null,p_is_duo:duo,p_duo_partner:duo?partner.trim()||null:null,p_is_content_shoot:content,p_internal_note:note.trim()||null,p_buffer_minutes:buffer,p_is_hidden:hidden,p_price_cents:price?Math.round(Number(price)*100):null,p_second_starts_at:two?s2:null,p_second_ends_at:two?e2:null});setSaving(false);if(error){setMsg(`Supabase: ${error.message}`);return}setMsg(hidden?"Intern gespeichert – noch nicht für Subs sichtbar.":"Veröffentlicht – Subs können jetzt buchen.");await reload()}return <section className="studioFormCard adminCalendarPanel"><div><span className="eyebrow">DOM / DOMINA · ADMIN</span><h2>Studio-Zeit eintragen</h2><p>Die erweiterten Optionen aus deinem Lady-Vanillaice-Adminbereich. Subs sehen nur das, was du veröffentlichst.</p></div><form className="studioForm adminStudioForm" onSubmit={submit}><label>Datum<input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label><label>Von<input type="time" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Bis<input type="time" value={end} onChange={e=>setEnd(e.target.value)}/></label><label className="span2">Studio / Adresse<input value={place} onChange={e=>setPlace(e.target.value)}/></label><label>Raum<input value={room} onChange={e=>setRoom(e.target.value)} placeholder="optional"/></label><label>Preis €/h<input value={price} onChange={e=>setPrice(e.target.value)} inputMode="decimal"/></label><label>Puffer<input type="number" min={0} max={240} step={15} value={buffer} onChange={e=>setBuffer(Number(e.target.value)||0)}/></label><label className="check"><input type="checkbox" checked={duo} onChange={e=>setDuo(e.target.checked)}/> Duo-Session</label>{duo&&<label>Duo-Partner<input value={partner} onChange={e=>setPartner(e.target.value)}/></label>}<label className="check"><input type="checkbox" checked={content} onChange={e=>setContent(e.target.checked)}/> Content-Dreh</label><label className="check"><input type="checkbox" checked={hidden} onChange={e=>setHidden(e.target.checked)}/> Erstmal unsichtbar</label><label className="check"><input type="checkbox" checked={two} onChange={e=>setTwo(e.target.checked)}/> Zweites Zeitfenster</label>{two&&<><label>2. Von<input type="time" value={s2} onChange={e=>setS2(e.target.value)}/></label><label>2. Bis<input type="time" value={e2} onChange={e=>setE2(e.target.value)}/></label></>}<label className="span3">Interne Notiz<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Nur Dom/Domina sieht das"/></label><button className="primaryButton" disabled={saving}>{saving?"Speichert …":hidden?"Intern speichern":"Veröffentlichen"}</button></form></section>}
 
-export default function CalendarPage() {
-  const [lang, setLang] = useState<Lang>("de");
-  const t = copy[lang];
-  const [loading, setLoading] = useState(true);
-  const [publishing, setPublishing] = useState(false);
-  const [message, setMessage] = useState("");
-  const [role, setRole] = useState("sub");
-  const [userId, setUserId] = useState("");
-  const [houseId, setHouseId] = useState<string | null>(null);
-  const [cursor, setCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [studioDays, setStudioDays] = useState<StudioDay[]>([]);
-  const [filter, setFilter] = useState<"all" | EventType>("all");
-  const [selectedDate, setSelectedDate] = useState(toDateKey(new Date()));
-  const [studioDate, setStudioDate] = useState(toDateKey(new Date()));
-  const [studioStart, setStudioStart] = useState("12:00");
-  const [studioEnd, setStudioEnd] = useState("18:00");
-  const [studioName, setStudioName] = useState("");
-  const [price, setPrice] = useState("");
-  const [bookingDay, setBookingDay] = useState<StudioDay | null>(null);
-  const [bookingStart, setBookingStart] = useState("");
-  const [bookingEnd, setBookingEnd] = useState("");
-  const [bookingNote, setBookingNote] = useState("");
+function AdminSlot({d,reload,setMsg}:{d:D;reload:()=>Promise<void>;setMsg:(x:string)=>void}){async function visibility(){const s=createClient(),{error}=await s.rpc("update_my_studio_window_visibility",{p_id:d.id,p_hidden:!d.is_hidden});if(error)setMsg(`Supabase: ${error.message}`);else{setMsg(d.is_hidden?"Jetzt für Subs sichtbar.":"Zeitfenster verborgen.");await reload()}}async function remove(){if(!confirm("Zeitfenster wirklich löschen?"))return;const s=createClient(),{error}=await s.rpc("delete_my_studio_window",{p_id:d.id});if(error)setMsg(`Supabase: ${error.message}`);else{setMsg("Gelöscht.");await reload()}}return <article className="adminSlot"><div><strong>{tm(d.starts_at)}–{tm(d.ends_at)}</strong><span>{d.studio_name}{d.room?` · ${d.room}`:""}</span><small>{d.is_duo?`Duo${d.duo_partner?` · ${d.duo_partner}`:""} · `:""}{d.is_content_shoot?"Content · ":""}Puffer {d.buffer_minutes??45} Min · {d.is_hidden?"UNSICHTBAR":"SICHTBAR"}</small>{d.internal_note&&<em>{d.internal_note}</em>}</div><div><button onClick={visibility}>{d.is_hidden?"Veröffentlichen":"Verbergen"}</button><button className="danger" onClick={remove}>Löschen</button></div></article>}
 
-  const isDom = role === "dom" || role === "domina";
-
-  const loadCalendar = useCallback(async () => {
-    setLoading(true); setMessage("");
-    const supabase = createClient();
-    const { data: auth } = await supabase.auth.getUser();
-    const user = auth.user;
-    if (!user) { window.location.href = "/anmelden?error=" + encodeURIComponent(t.login); return; }
-    setUserId(user.id);
-
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    const metadataRole = String(user.user_metadata?.role || "").toLowerCase();
-    const currentRole = metadataRole === "dom" || metadataRole === "domina" ? metadataRole : String(profile?.role || metadataRole || "sub").toLowerCase();
-    setRole(currentRole);
-
-    let activeHouse: string | null = null;
-    if (currentRole === "dom" || currentRole === "domina") {
-      const { data: house } = await supabase.from("houses").select("id").eq("owner_id", user.id).maybeSingle();
-      activeHouse = house?.id || null;
-    } else {
-      const { data: membership } = await supabase.from("memberships").select("house_id").eq("member_id", user.id).is("ended_at", null).limit(1).maybeSingle();
-      activeHouse = membership?.house_id || null;
-    }
-    setHouseId(activeHouse);
-
-    const { data: days, error: dayError } = await supabase.rpc("get_visible_studio_windows");
-    if (dayError) setMessage(`Supabase: ${dayError.message}`);
-    const nextDays: StudioDay[] = (days || []).map((day: any) => ({ id: day.id, houseId: day.house_id, date: day.event_date, start: trimTime(day.starts_at), end: trimTime(day.ends_at), studio: day.studio_name, hourlyPrice: day.price_cents == null ? undefined : day.price_cents / 100 }));
-    setStudioDays(nextDays);
-
-    const nextEvents: CalendarEvent[] = nextDays.map(day => ({ id: `studio-${day.id}`, date: day.date, start: day.start, end: day.end, title: `Studio-Tag · ${day.studio}`, type: "studio" }));
-
-    const { data: bookings } = await supabase.from("slot_bookings").select("id,studio_day_id,starts_at,ends_at,status,requester_id").not("studio_day_id", "is", null);
-    const dayMap = new Map(nextDays.map(day => [day.id, day]));
-    for (const booking of bookings || []) {
-      const day = dayMap.get(booking.studio_day_id);
-      if (!day) continue;
-      nextEvents.push({ id: `booking-${booking.id}`, date: day.date, start: trimTime(booking.starts_at), end: trimTime(booking.ends_at), title: booking.status === "confirmed" ? "Bestätigte Session" : "Session angefragt", type: "booking", status: booking.status });
-    }
-
-    const { data: tasks } = await supabase.from("tasks").select("id,title,due_at,status").not("due_at", "is", null).order("due_at", { ascending: true });
-    for (const task of tasks || []) {
-      const due = new Date(task.due_at);
-      nextEvents.push({ id: `task-${task.id}`, date: toDateKey(due), start: `${pad(due.getHours())}:${pad(due.getMinutes())}`, title: task.title, type: "task", status: task.status });
-    }
-
-    setEvents(nextEvents); setLoading(false);
-  }, [t.login]);
-
-  useEffect(() => { void loadCalendar(); }, [loadCalendar]);
-
-  const monthLabel = new Intl.DateTimeFormat(lang === "de" ? "de-DE" : "en-GB", { month: "long", year: "numeric" }).format(cursor);
-  const days = useMemo(() => { const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1); const offset = (first.getDay() + 6) % 7; return Array.from({ length: 42 }, (_, i) => new Date(cursor.getFullYear(), cursor.getMonth(), i - offset + 1)); }, [cursor]);
-  const visibleEvents = events.filter(e => filter === "all" || e.type === filter);
-  const selectedEvents = visibleEvents.filter(e => e.date === selectedDate);
-  const selectedStudioDays = studioDays.filter(day => day.date === selectedDate);
-
-  async function createStudioDay(event: FormEvent) {
-    event.preventDefault();
-    setMessage("");
-    if (!isDom || !userId || !studioName.trim()) { setMessage(t.noHouse); return; }
-    if (mins(studioEnd) <= mins(studioStart)) { setMessage(t.invalidWindow); return; }
-    setPublishing(true);
-    const supabase = createClient();
-    const { error } = await supabase.rpc("publish_studio_window", {
-      p_event_date: studioDate,
-      p_starts_at: studioStart,
-      p_ends_at: studioEnd,
-      p_studio_name: studioName.trim(),
-      p_price_cents: price ? Math.round(Number(price) * 100) : null
-    });
-    setPublishing(false);
-    if (error) { setMessage(`Supabase: ${error.message}`); return; }
-    setSelectedDate(studioDate);
-    setMessage(t.saved);
-    await loadCalendar();
-  }
-
-  function openBooking(day: StudioDay) {
-    setBookingDay(day); setBookingStart(day.start); setBookingEnd(day.end); setBookingNote("");
-  }
-
-  async function sendBooking(event: FormEvent) {
-    event.preventDefault();
-    if (!bookingDay || !userId) return;
-    if (mins(bookingEnd) <= mins(bookingStart)) { setMessage(t.invalidWindow); return; }
-    if (mins(bookingStart) < mins(bookingDay.start) || mins(bookingEnd) > mins(bookingDay.end)) { setMessage(t.outsideWindow); return; }
-    const supabase = createClient();
-    const { error } = await supabase.rpc("request_studio_booking", { p_studio_day_id: bookingDay.id, p_starts_at: bookingStart, p_ends_at: bookingEnd, p_note: bookingNote.trim() || null });
-    if (error) { setMessage(`Supabase: ${error.message}`); return; }
-    setBookingDay(null); setMessage(t.saved); await loadCalendar();
-  }
-
-  return <main className="calendarPage">
-    <header className="calendarTop"><div><Link href="/" className="backLink">← {t.back}</Link><span className="eyebrow">HOUSE OF DOMS</span><h1>{t.title}</h1><p>{t.subtitle}</p><p>{isDom ? t.domHint : t.subHint}</p></div><div className="languageSwitch"><button className={lang === "de" ? "active" : ""} onClick={() => setLang("de")}>DE</button><button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>EN</button></div></header>
-    {message && <p className="calendarMessage">{message}</p>}
-    {loading ? <section className="calendarCard"><p>{t.loading}</p></section> : <>
-      <section className="calendarStats"><article><span>{t.studioDays}</span><strong>{events.filter(e => e.type === "studio").length}</strong></article><article><span>{t.available}</span><strong>{studioDays.length}</strong></article><article><span>{t.bookings}</span><strong>{events.filter(e => e.type === "booking").length}</strong></article><article><span>{t.tasks}</span><strong>{events.filter(e => e.type === "task").length}</strong></article></section>
-      <section className="calendarLayout"><div className="calendarCard"><div className="calendarToolbar"><button onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1))}>‹</button><h2>{monthLabel}</h2><button onClick={() => setCursor(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1))}>›</button><button className="todayButton" onClick={() => { const now = new Date(); setCursor(new Date(now.getFullYear(), now.getMonth(), 1)); setSelectedDate(toDateKey(now)); }}>{t.today}</button></div><div className="filters"><span>{t.filters}:</span>{(["all", "task", "studio", "booking"] as const).map(value => <button key={value} className={filter === value ? "activeFilter" : ""} onClick={() => setFilter(value)}>{value === "all" ? t.all : value === "task" ? t.openTasks : value === "studio" ? t.studioDays : t.bookings}</button>)}</div><div className="weekHeader">{t.week.map(day => <span key={day}>{day}</span>)}</div><div className="monthGrid">{days.map(day => { const key = toDateKey(day); const dayEvents = visibleEvents.filter(e => e.date === key); return <button key={key} className={`dayCell ${day.getMonth() !== cursor.getMonth() ? "outside" : ""} ${selectedDate === key ? "selectedDay" : ""}`} onClick={() => setSelectedDate(key)}><span className="dayNumber">{day.getDate()}</span><div className="dayEvents">{dayEvents.slice(0, 3).map(item => <span key={item.id} className={`eventPill ${item.type}`}>{item.start ? `${item.start} ` : ""}{item.title}</span>)}</div></button>; })}</div></div>
-      <aside className="agendaCard"><div className="panelHead"><div><span className="eyebrow">{selectedDate}</span><h2>{t.agenda}</h2></div></div>{selectedEvents.length === 0 && selectedStudioDays.length === 0 && <p className="empty">{t.noEvents}</p>}{selectedEvents.map(event => <article className={`agendaItem ${event.type}`} key={event.id}><span>{event.start}{event.end ? `–${event.end}` : ""}</span><strong>{event.title}</strong></article>)}<h3>{t.available}</h3>{selectedStudioDays.map(day => <article className="slotRow" key={day.id}><div><strong>{day.start}–{day.end}</strong><span>{day.studio}{day.hourlyPrice != null ? ` · ${day.hourlyPrice.toFixed(2)} €/h` : ""}</span></div>{!isDom && <button onClick={() => openBooking(day)}>{t.book}</button>}</article>)}</aside></section>
-      {isDom && <section className="studioFormCard"><div><span className="eyebrow">DOM / DOMINA</span><h2>{t.addStudio}</h2><p>{t.domHint}</p></div><form onSubmit={createStudioDay} className="studioForm"><label>{t.studioDate}<input type="date" value={studioDate} onChange={e => setStudioDate(e.target.value)} required /></label><label>{t.from}<input type="time" value={studioStart} onChange={e => setStudioStart(e.target.value)} required /></label><label>{t.to}<input type="time" value={studioEnd} onChange={e => setStudioEnd(e.target.value)} required /></label><label>{t.studio}<input value={studioName} onChange={e => setStudioName(e.target.value)} required /></label><label>{t.price}<input type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} /></label><button className="primaryButton" disabled={publishing}>{publishing ? t.publishing : t.create}</button></form></section>}
-      <section className="legend"><strong>{t.legend}</strong><span><i className="taskDot" />{t.openTasks}</span><span><i className="studioDot" />{t.studioDays}</span><span><i className="bookingDot" />{t.bookings}</span></section>
-    </>}
-    {bookingDay && <div className="modalBackdrop" onClick={() => setBookingDay(null)}><form className="bookingModal" onSubmit={sendBooking} onClick={e => e.stopPropagation()}><button type="button" className="close" onClick={() => setBookingDay(null)}>×</button><span className="eyebrow">{t.selected}</span><h2>{bookingDay.date} · {bookingDay.studio}</h2><p>{bookingDay.start}–{bookingDay.end}</p><label>{t.sessionFrom}<input type="time" min={bookingDay.start} max={bookingDay.end} value={bookingStart} onChange={e => setBookingStart(e.target.value)} required /></label><label>{t.sessionTo}<input type="time" min={bookingDay.start} max={bookingDay.end} value={bookingEnd} onChange={e => setBookingEnd(e.target.value)} required /></label><label>{t.bookingNote}<textarea value={bookingNote} onChange={e => setBookingNote(e.target.value)} rows={4} /></label><button className="primaryButton">{t.request}</button></form></div>}
-  </main>;
-}
+function SubSlot({d,uid,reload,setMsg}:{d:D;uid:string;reload:()=>Promise<void>;setMsg:(x:string)=>void}){const[open,setOpen]=useState(false),[start,setStart]=useState(tm(d.starts_at)),[end,setEnd]=useState(tm(d.ends_at)),[note,setNote]=useState("");async function send(e:FormEvent){e.preventDefault();if(!uid||mins(end)<=mins(start)||mins(start)<mins(tm(d.starts_at))||mins(end)>mins(tm(d.ends_at))){setMsg("Die Session muss vollständig im freigegebenen Zeitfenster liegen.");return}const s=createClient(),{error}=await s.rpc("request_studio_booking",{p_studio_day_id:d.id,p_starts_at:start,p_ends_at:end,p_note:note.trim()||null});if(error){setMsg(`Supabase: ${error.message}`);return}setOpen(false);setMsg("Buchungsanfrage gesendet.");await reload()}return <article className="slotRow"><div><strong>{tm(d.starts_at)}–{tm(d.ends_at)}</strong><span>{d.studio_name}{d.room?` · ${d.room}`:""}{d.is_duo?" · Duo":""}{d.is_content_shoot?" · Content":""}</span></div><button onClick={()=>setOpen(true)}>Session buchen</button>{open&&<div className="modalBackdrop"><form className="bookingModal" onSubmit={send}><button type="button" className="close" onClick={()=>setOpen(false)}>×</button><span className="eyebrow">SESSION BUCHEN</span><h2>{d.studio_name}</h2><p>Freies Fenster: {tm(d.starts_at)}–{tm(d.ends_at)}. Start und Länge bestimmst du.</p><label>Start<input type="time" value={start} min={tm(d.starts_at)} max={tm(d.ends_at)} onChange={e=>setStart(e.target.value)}/></label><label>Ende<input type="time" value={end} min={tm(d.starts_at)} max={tm(d.ends_at)} onChange={e=>setEnd(e.target.value)}/></label><label>Notiz<textarea rows={4} value={note} onChange={e=>setNote(e.target.value)}/></label><button className="primaryButton">Buchungsanfrage senden</button></form></div>}</article>}
