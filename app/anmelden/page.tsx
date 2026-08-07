@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "../../lib/supabase/client";
 
 export default function AnmeldenPage() {
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) setMessage(error);
+    if (searchParams.get("tab") === "register") setMode("register");
+  }, [searchParams]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,7 +31,7 @@ export default function AnmeldenPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        window.location.href = "/";
+        window.location.href = "/profil";
       } else {
         const displayName = String(form.get("displayName") ?? "");
         const role = String(form.get("role") ?? "sub");
@@ -34,12 +42,12 @@ export default function AnmeldenPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=/profil`,
             data: { display_name: displayName, role, is_adult_confirmed: adult },
           },
         });
         if (error) throw error;
-        setMessage("Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse.");
+        setMessage("Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse. Danach wirst du direkt zu deinem Profil weitergeleitet.");
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Ein unbekannter Fehler ist aufgetreten.");
@@ -68,7 +76,7 @@ export default function AnmeldenPage() {
         <button className="authMode" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
           {mode === "login" ? "Noch kein Konto? Jetzt registrieren" : "Bereits registriert? Jetzt anmelden"}
         </button>
-        <small>Die Anmeldung funktioniert, sobald die Supabase-Variablen in Vercel eingetragen wurden.</small>
+        <small>Nach erfolgreicher Anmeldung wirst du direkt zu deinem Profil weitergeleitet.</small>
       </section>
     </main>
   );
