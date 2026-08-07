@@ -6,7 +6,11 @@ alter table public.chastity_records add column if not exists checkin_interval_ho
 alter table public.chastity_records add column if not exists hygiene_break_notes text;
 alter table public.chastity_records add column if not exists agreed_rules text;
 
-create or replace function public.get_my_chastity_records()
+-- Der Rueckgabetyp wurde gegenueber 023 erweitert. PostgreSQL kann den
+-- OUT-/TABLE-Rueckgabetyp nicht per CREATE OR REPLACE aendern, daher zuerst droppen.
+drop function if exists public.get_my_chastity_records();
+
+create function public.get_my_chastity_records()
 returns table(
   id uuid, house_id uuid, dom_id uuid, sub_id uuid, counterpart_name text,
   device_label text, cage_type text, material text, started_at timestamptz,
@@ -27,7 +31,12 @@ language sql security definer set search_path=public stable as $$
 $$;
 grant execute on function public.get_my_chastity_records() to authenticated;
 
-create or replace function public.start_chastity_record(
+-- Alte 4-Parameter-Version aus 023 entfernen, damit PostgREST nur noch die
+-- aktuelle erweiterte RPC-Signatur im Schema hat.
+drop function if exists public.start_chastity_record(uuid,text,timestamptz,text);
+drop function if exists public.start_chastity_record(uuid,text,timestamptz,text,text,text,timestamptz,integer,text,text);
+
+create function public.start_chastity_record(
   p_sub_id uuid,
   p_device_label text default 'Keuschheitskaefig',
   p_planned_review_at timestamptz default null,
