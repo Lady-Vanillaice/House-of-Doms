@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { createClient } from "../../lib/supabase/client";
 import "./kammer.css";
 
@@ -11,14 +10,13 @@ type Candidate={user_id:string;display_name:string;role:string};
 type Msg={id:string;sender_id:string;recipient_id:string;body:string|null;attachment_type:"image"|"video"|"audio"|"file"|null;attachment_path:string|null;linked_task_id:string|null;linked_booking_id:string|null;reply_to_id:string|null;pinned_at:string|null;created_at:string};
 
 export default function ChamberPage(){
- const params=useSearchParams();
  const [contacts,setContacts]=useState<Contact[]>([]); const [active,setActive]=useState(""); const [query,setQuery]=useState("");
  const [messages,setMessages]=useState<Msg[]>([]); const [draft,setDraft]=useState(""); const [me,setMe]=useState(""); const [replying,setReplying]=useState<Msg|null>(null);
  const [loading,setLoading]=useState(true); const [sending,setSending]=useState(false); const [notice,setNotice]=useState("");
  const [pendingFile,setPendingFile]=useState<File|null>(null); const imageRef=useRef<HTMLInputElement>(null); const videoRef=useRef<HTMLInputElement>(null); const audioRef=useRef<HTMLInputElement>(null); const fileRef=useRef<HTMLInputElement>(null);
  const [showNew,setShowNew]=useState(false); const [candidateQuery,setCandidateQuery]=useState(""); const [candidates,setCandidates]=useState<Candidate[]>([]); const [searching,setSearching]=useState(false);
 
- const loadContacts=useCallback(async()=>{const supabase=createClient();const {data:auth}=await supabase.auth.getUser();if(!auth.user){location.href="/anmelden";return;}setMe(auth.user.id);const {data,error}=await supabase.rpc("get_chamber_contacts");if(error){setNotice(`Supabase: ${error.message}`);setLoading(false);return;}const list=(data||[]) as Contact[];setContacts(list);const fromUrl=params.get("contact")||"";setActive(v=>v||fromUrl||list[0]?.user_id||"");setLoading(false);},[params]);
+ const loadContacts=useCallback(async()=>{const supabase=createClient();const {data:auth}=await supabase.auth.getUser();if(!auth.user){location.href="/anmelden";return;}setMe(auth.user.id);const {data,error}=await supabase.rpc("get_chamber_contacts");if(error){setNotice(`Supabase: ${error.message}`);setLoading(false);return;}const list=(data||[]) as Contact[];setContacts(list);const fromUrl=typeof window!=="undefined"?new URLSearchParams(window.location.search).get("contact")||"":"";setActive(v=>v||fromUrl||list[0]?.user_id||"");setLoading(false);},[]);
  const loadMessages=useCallback(async(id:string)=>{if(!id)return;const supabase=createClient();const {data,error}=await supabase.rpc("get_chamber_messages_v2",{p_other_user:id});if(error){setNotice(`Supabase: ${error.message}`);return;}setMessages((data||[]) as Msg[]);},[]);
  const searchCandidates=useCallback(async(q:string)=>{setSearching(true);setNotice("");const supabase=createClient();const {data,error}=await supabase.rpc("search_chamber_contacts",{p_query:q});setSearching(false);if(error){setNotice(`Supabase: ${error.message}`);return;}setCandidates((data||[]) as Candidate[]);},[]);
  useEffect(()=>{void loadContacts();},[loadContacts]); useEffect(()=>{if(active)void loadMessages(active);else setMessages([]);setReplying(null);},[active,loadMessages]);
