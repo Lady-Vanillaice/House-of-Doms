@@ -1,0 +1,41 @@
+.luxuryEntrance{background:radial-gradient(circle at 50% 18%,rgba(205,139,56,.18),transparent 26%),linear-gradient(180deg,#0d0a07 0%,#080604 46%,#020202 100%)}
+.entranceStone{background:linear-gradient(rgba(255,255,255,.01),rgba(255,255,255,.01)),repeating-linear-gradient(0deg,transparent 0 70px,rgba(89,61,37,.18) 71px 73px),repeating-linear-gradient(90deg,transparent 0 122px,rgba(82,55,31,.14) 123px 125px),radial-gradient(circle at 50% 42%,rgba(118,74,34,.08),transparent 55%)}
+.entranceStone:before,.entranceStone:after{content:"";position:absolute;top:0;bottom:0;width:16%;background:linear-gradient(90deg,rgba(0,0,0,.54),rgba(28,19,12,.18),transparent)}
+.entranceStone:before{left:0}.entranceStone:after{right:0;transform:scaleX(-1)}
+.facadeCornice{position:absolute;left:0;right:0;top:10%;height:22px;background:linear-gradient(180deg,#19110b,#3d2917 35%,#120d09 38%,#090704 100%);box-shadow:0 10px 20px rgba(0,0,0,.45),inset 0 1px rgba(203,145,68,.16);opacity:.9;z-index:2}
+.floor{background:linear-gradient(180deg,rgba(15,10,6,.2),#080604 30%,#030302),repeating-linear-gradient(90deg,transparent 0 128px,rgba(173,113,47,.08) 129px 131px),repeating-linear-gradient(0deg,transparent 0 54px,rgba(160,109,51,.07) 55px 57px)}
+.floorReflection{position:absolute;left:50%;bottom:-3%;width:min(760px,72vw);height:27%;transform:translateX(-50%);background:linear-gradient(180deg,rgba(197,124,44,.11),rgba(219,147,61,.025) 48%,transparent);filter:blur(7px);clip-path:polygon(31% 0,69% 0,92% 100%,8% 100%);z-index:2;pointer-events:none}
+.entranceScene{position:relative}
+.doorTemple{filter:drop-shadow(0 34px 45px rgba(0,0,0,.72))}
+.arch{border-radius:50% 50% 1.5% 1.5%/24% 24% 1.5% 1.5%;background:linear-gradient(90deg,#17100b 0%,#49321d 6%,#76502b 10%,#312215 15%,#5b3c20 21%,#21160e 28%,#17100a 50%,#21160e 72%,#5b3c20 79%,#312215 85%,#76502b 90%,#49321d 94%,#17100b 100%);box-shadow:0 56px 110px rgba(0,0,0,.9),0 0 0 2px rgba(128,83,39,.42),0 0 0 12px rgba(34,24,16,.75),0 0 0 17px rgba(78,53,31,.34),inset 0 0 80px rgba(228,160,70,.08)}
+.arch:after{content:"";position:absolute;inset:22px 18px 12px;border:1px solid rgba(173,116,51,.15);border-radius:49% 49% 1% 1%/23% 23% 1% 1%;pointer-events:none;box-shadow:inset 0 0 28px rgba(0,0,0,.7)}
+.archCrown{height:7px;top:1.5%;background:linear-gradient(90deg,transparent,#6c4725 11%,#d0a15a 50%,#6b4725 89%,transparent);box-shadow:0 5px 14px rgba(0,0,0,.5)}
+.stonePilaster{position:absolute;top:24%;bottom:74px;width:54px;z-index:4;background:linear-gradient(90deg,#17100b,#654522 32%,#2f2014 64%,#120d09);box-shadow:0 0 0 1px rgba(172,116,56,.18),inset 0 0 15px rgba(0,0,0,.5)}
+.stonePilaster:before,.stonePilaster:after{content:"";position:absolute;left:-8px;right:-8px;height:18px;background:linear-gradient(180deg,#684522,#251810);border:1px solid rgba(181,123,57,.18)}
+.stonePilaster:before{top:-9px}.stonePilaster:after{bottom:-9px}.stonePilaster i{display:block;height:31%;margin:12% 8px;border:1px solid rgba(176,117,51,.14);box-shadow:inset 0 0 8px rgba(0,0,0,.55)}
+.pilasterLeft{left:-18px}.pilasterRight{right:-18px}
+.transom{height:20%;background:radial-gradient(circle at 50% 100%,rgba(253,193,106,.46),rgba(104,60,28,.32) 42%,rgba(10,7,4,.97) 72%);box-shadow:inset 0 -20px 36px rgba(0,0,0,.65),inset 0 0 28px rgba(221,153,66,.06)}
+.transom:after{content:"";position:absolute;inset:8% 9% 0;border:1px solid rgba(207,142,59,.18);border-radius:50% 50% 0 0/100% 100% 0 0;box-shadow:inset 0 0 18px rgba(219,151,66,.06)}
+.fanArc{position:absolute;left:50%;bottom:-1px;transform-origin:50% 100%;height:88%;width:1px;background:linear-gradient(transparent,rgba(226,162,81,.4))}.arcOne{transform:rotate(-58deg)}.arcTwo{transform:rotate(-29deg)}.arcThree{transform:rotate(58deg)}
+.doubleDoor{overflow:visible;background:#050403;box-shadow:inset 0 0 90px #000,0 0 0 4px rgba(68,43,21,.76),0 0 0 8px rgba(19,13,9,.9)}
+.doorLeaf{background:linear-gradient(90deg,#050403 0%,#15100b 18%,#090705 42%,#20150d 72%,#060403 100%);box-shadow:inset 0 0 48px rgba(0,0,0,.92),inset 0 0 0 1px rgba(190,127,53,.14),0 0 20px rgba(0,0,0,.28)}
+.doorLeaf:before{inset:5.5%;border:1px solid rgba(197,132,57,.26);box-shadow:inset 0 0 0 6px rgba(35,23,14,.56),inset 0 0 24px rgba(220,158,68,.025)}
+.panelTop,.panelBottom{border-color:rgba(202,137,59,.34);box-shadow:inset 0 0 0 5px rgba(25,18,12,.82),inset 0 0 18px rgba(224,160,70,.025),0 0 0 1px rgba(0,0,0,.8)}
+.doorMoulding{position:absolute;inset:3%;border:1px solid rgba(121,78,34,.18);pointer-events:none}
+.handles span{height:70px;width:8px;border-radius:10px;background:linear-gradient(90deg,#81501f,#f1c776 45%,#8b5724);box-shadow:0 0 12px rgba(235,175,80,.28),inset 0 0 2px #fff2b2}
+.doorOrnament img{filter:drop-shadow(0 0 7px rgba(226,166,78,.38))}
+.lantern{width:38px;height:72px;border-color:#7d5228;background:linear-gradient(#3a2513,#090603);box-shadow:0 0 65px 26px rgba(228,146,53,.26)}
+.lantern span{inset:9px 7px;background:radial-gradient(circle,#ffe0a0 0,#efaa50 27%,#9e521b 64%,#3d1c08 100%);box-shadow:0 0 30px rgba(237,156,61,.9)}
+.lantern:after{content:"";position:absolute;left:50%;bottom:-8px;width:16px;height:8px;transform:translateX(-50%);border:1px solid #69441f;background:#15100a}
+.sideGarden{position:absolute;bottom:12%;width:180px;height:280px;z-index:3;pointer-events:none}.leftGarden{left:1.5%}.rightGarden{right:1.5%;transform:scaleX(-1)}
+.gardenPot{position:absolute;left:36px;bottom:0;width:82px;height:92px;background:linear-gradient(90deg,#070604,#2b1d11 40%,#100b07 72%,#050403);clip-path:polygon(10% 0,90% 0,79% 100%,21% 100%);border-top:2px solid rgba(139,90,40,.5);box-shadow:0 25px 30px rgba(0,0,0,.65)}
+.gardenPot:after{content:"";position:absolute;left:8px;right:8px;top:15px;height:1px;background:rgba(151,100,47,.26)}
+.shrub{position:absolute;bottom:70px;border-radius:48% 52% 42% 58%;background:radial-gradient(circle at 55% 45%,#182418 0,#0c150d 45%,#050805 76%);box-shadow:inset 0 0 28px rgba(0,0,0,.68),0 9px 20px rgba(0,0,0,.55)}
+.shrub:before,.shrub:after{content:"";position:absolute;border-radius:50%;background:#101c11}.shrubTall{left:46px;width:65px;height:175px}.shrubTall:before{width:43px;height:90px;left:-20px;bottom:22px}.shrubTall:after{width:38px;height:76px;right:-17px;bottom:38px}.shrubLow{left:4px;bottom:52px;width:62px;height:74px;opacity:.92}
+.groundLamp{position:absolute;bottom:10%;width:12px;height:8px;background:#f5bd65;border-radius:2px;box-shadow:0 0 18px 8px rgba(236,155,57,.24);z-index:4}.groundLampLeft{left:12%}.groundLampRight{right:12%}
+.entryRunner{position:absolute;left:50%;bottom:-68px;width:34%;height:118px;transform:translateX(-50%);background:linear-gradient(180deg,rgba(42,26,15,.88),rgba(8,6,4,.98));clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);box-shadow:0 -1px rgba(173,112,46,.12),0 18px 32px rgba(0,0,0,.65);z-index:-1}
+.housePlaque{border-color:rgba(205,142,60,.34);background:linear-gradient(145deg,#050504,#17110c);box-shadow:0 28px 70px rgba(0,0,0,.66),0 0 0 7px rgba(31,22,14,.62),inset 0 0 34px rgba(204,143,58,.04)}
+.housePlaque:after{content:"";position:absolute;inset:-14px;background:linear-gradient(90deg,transparent,rgba(115,74,35,.14),transparent);z-index:-1;filter:blur(10px)}
+.housePlaque strong{text-shadow:0 0 16px rgba(218,163,78,.12)}
+@media(max-width:980px){.sideGarden{opacity:.62;transform:scale(.78)}.rightGarden{transform:scaleX(-1) scale(.78)}.leftGarden{left:-42px}.rightGarden{right:-42px}.stonePilaster{display:none}.entryRunner{width:48%}}
+@media(max-width:650px){.facadeCornice,.sideGarden,.groundLamp{display:none}.arch{box-shadow:0 42px 90px rgba(0,0,0,.9),0 0 0 1px rgba(128,83,39,.4),0 0 0 8px rgba(34,24,16,.7)}.entryRunner{width:62%;bottom:-54px;height:92px}.lantern{width:30px;height:58px}}
