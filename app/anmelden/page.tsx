@@ -14,8 +14,11 @@ function AnmeldenContent() {
   useEffect(() => {
     const error = searchParams.get("error");
     if (error) setMessage(error);
-    if (searchParams.get("tab") === "register") setMode("register");
+    if (searchParams.get("tab") === "register" || searchParams.get("rolle")) setMode("register");
   }, [searchParams]);
+
+  const requestedUse = searchParams.get("rolle");
+  const defaultRole = requestedUse === "creator" ? "dom" : requestedUse === "both" ? "switch" : "sub";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,7 +37,7 @@ function AnmeldenContent() {
         window.location.href = "/profil";
       } else {
         const displayName = String(form.get("displayName") ?? "");
-        const role = String(form.get("role") ?? "sub");
+        const role = String(form.get("role") ?? defaultRole);
         const adult = form.get("adult") === "on";
         if (!adult) throw new Error("Bitte bestätige, dass du mindestens 18 Jahre alt bist.");
 
@@ -60,16 +63,25 @@ function AnmeldenContent() {
     <main className="authPage">
       <section className="authCard">
         <Link href="/" className="authBrand"><span className="crest">H</span><span>HOUSE OF DOMS</span></Link>
-        <p className="eyebrow">{mode === "login" ? "WILLKOMMEN ZURÜCK" : "DEIN PERSÖNLICHES HOUSE"}</p>
+        <p className="eyebrow">{mode === "login" ? "WILLKOMMEN ZURÜCK" : "DEIN BEREICH IM HOUSE"}</p>
         <h1>{mode === "login" ? "Anmelden" : "Konto erstellen"}</h1>
+        {mode === "register" && <p>Für Creator, Session-Anbieter, Members und alle Kinks. Du musst dich nicht als Domina oder Sub definieren.</p>}
         <form onSubmit={submit}>
           {mode === "register" && <>
             <label>Anzeigename<input name="displayName" minLength={2} maxLength={60} required /></label>
-            <label>Rolle<select name="role" required><option value="domina">Domina</option><option value="dom">Dom</option><option value="sub">Sub</option><option value="sklave">Sklave</option></select></label>
+            <label>Wie möchtest du House of Doms nutzen?
+              <select name="role" required defaultValue={defaultRole}>
+                <option value="dom">Content & Sessions anbieten</option>
+                <option value="sub">Entdecken, folgen & buchen</option>
+                <option value="switch">Beides – anbieten und entdecken</option>
+                <option value="domina">Domina / Femdom als Hauptrolle</option>
+                <option value="sklave">Sub / Sklave als Hauptrolle</option>
+              </select>
+            </label>
           </>}
           <label>E-Mail-Adresse<input type="email" name="email" autoComplete="email" required /></label>
           <label>Passwort<input type="password" name="password" minLength={8} autoComplete={mode === "login" ? "current-password" : "new-password"} required /></label>
-          {mode === "register" && <label className="consentCheck"><input type="checkbox" name="adult" required /><span>Ich bin mindestens 18 Jahre alt und akzeptiere, dass die Plattform ausschließlich auf freiwilligen und einvernehmlichen Interaktionen basiert.</span></label>}
+          {mode === "register" && <label className="consentCheck"><input type="checkbox" name="adult" required /><span>Ich bin mindestens 18 Jahre alt und akzeptiere, dass Content, Kontakte und Sessions auf der Plattform ausschließlich freiwillig, einvernehmlich und innerhalb persönlicher Grenzen stattfinden.</span></label>}
           <button className="enterButton" disabled={loading}>{loading ? "Bitte warten …" : mode === "login" ? "ANMELDEN →" : "REGISTRIEREN →"}</button>
         </form>
         {message && <p className="authMessage" role="status">{message}</p>}
