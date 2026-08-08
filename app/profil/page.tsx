@@ -37,16 +37,16 @@ const emptyProfile: Profile = {
 };
 
 const roleLabels: Record<string, string> = {
-  domina: "Domina",
-  dom: "Dom",
-  sub: "Sub",
-  sklave: "Sklave",
-  switch: "Switch",
+  domina: "Domina · Creator",
+  dom: "Creator / Session-Anbieter",
+  sub: "Member · Entdecken & Buchen",
+  sklave: "Sub / Sklave",
+  switch: "Creator & Member / Switch",
 };
 
 const contactLabels: Record<string, string> = {
   open: "Geöffnet",
-  applications: "Nur Bewerbungen",
+  applications: "Nur Anfragen",
   closed: "Geschlossen",
 };
 
@@ -136,6 +136,14 @@ export default function ProfilePage() {
     window.location.href = "/";
   }
 
+  const isProvider = ["domina", "dom"].includes(profile.role);
+  const isBoth = profile.role === "switch";
+  const usageText = isProvider
+    ? "Content anbieten · Sessions anbieten · Memberships verwalten"
+    : isBoth
+      ? "Content anbieten · entdecken · buchen"
+      : "Entdecken · Content folgen · Sessions buchen";
+
   if (loading) return <main className="profilePage"><section className="profileHero"><div className="profileHeroCopy"><span className="eyebrow">PROFIL WIRD GELADEN</span><h1>Einen Moment …</h1></div></section></main>;
 
   return <main className="profilePage">
@@ -144,7 +152,7 @@ export default function ProfilePage() {
       <div className="profileHeroCopy">
         <span className="eyebrow">{profile.visibility === "public" ? "ÖFFENTLICHES PROFIL" : "PRIVATES PROFIL"}</span>
         <h1>{profile.display_name || "Dein Profil"}</h1>
-        <p>{profile.bio || "Ergänze deine Bio, Interessen und Grenzen, damit passende Kontakte dich besser einschätzen können."}</p>
+        <p>{profile.bio || "Ergänze deine Bio, Kinks, Interessen, Angebote und Grenzen, damit andere besser sehen können, was zu dir passt."}</p>
         <div className="profileMeta">
           <span>{roleLabels[profile.role] ?? profile.role}</span>
           {profile.location && <span>{profile.location}</span>}
@@ -164,22 +172,22 @@ export default function ProfilePage() {
       <article className="profileCard"><h2>Konto & Kontakt</h2>
         <label>E-Mail<input value={email} disabled /></label>
         <label>Anzeigename<input value={profile.display_name} onChange={e => setProfile(p => ({...p, display_name:e.target.value}))} disabled={!editing}/></label>
-        <label>Status<select value={profile.contact_status} onChange={e => setProfile(p => ({...p, contact_status:e.target.value}))} disabled={!editing}><option value="open">Geöffnet</option><option value="applications">Nur Bewerbungen</option><option value="closed">Geschlossen</option></select></label>
-        <label>Rolle<select value={profile.role} onChange={e => setProfile(p => ({...p, role:e.target.value}))} disabled={!editing}><option value="domina">Domina</option><option value="dom">Dom</option><option value="sub">Sub</option><option value="sklave">Sklave</option><option value="switch">Switch</option></select></label>
+        <label>Kontaktstatus<select value={profile.contact_status} onChange={e => setProfile(p => ({...p, contact_status:e.target.value}))} disabled={!editing}><option value="open">Geöffnet</option><option value="applications">Nur Anfragen</option><option value="closed">Geschlossen</option></select></label>
+        <label>Nutzung / Rolle<select value={profile.role} onChange={e => setProfile(p => ({...p, role:e.target.value}))} disabled={!editing}><option value="dom">Creator / Session-Anbieter</option><option value="sub">Member · Entdecken & Buchen</option><option value="switch">Creator & Member / Switch</option><option value="domina">Domina · Creator</option><option value="sklave">Sub / Sklave</option></select></label>
         <label>Standort<input value={profile.location} onChange={e => setProfile(p => ({...p, location:e.target.value}))} disabled={!editing}/></label>
         <label>Sprachen<input value={profile.languages.join(", ")} onChange={e => setProfile(p => ({...p, languages:csvToArray(e.target.value)}))} disabled={!editing}/></label>
         <label>Sichtbarkeit<select value={profile.visibility} onChange={e => setProfile(p => ({...p, visibility:e.target.value}))} disabled={!editing}><option value="public">Öffentlich</option><option value="members">Nur Mitglieder</option><option value="private">Privat</option></select></label>
       </article>
 
-      <article className="profileCard"><h2>Über mich</h2><textarea value={profile.bio} onChange={e => setProfile(p => ({...p, bio:e.target.value}))} disabled={!editing}/></article>
+      <article className="profileCard"><h2>Über mich</h2><textarea value={profile.bio} onChange={e => setProfile(p => ({...p, bio:e.target.value}))} disabled={!editing} placeholder="Wer bist du, welche Kinks interessieren dich und was möchtest du hier teilen oder entdecken?"/></article>
 
-      <article className="profileCard"><h2>Biete ich</h2>{editing ? <textarea value={profile.offers.join(", ")} onChange={e => setProfile(p => ({...p, offers:csvToArray(e.target.value)}))}/> : <div className="tagCloud">{profile.offers.length ? profile.offers.map(x => <span key={x}>{x}</span>) : <span>Noch nicht ausgefüllt</span>}</div>}</article>
+      <article className="profileCard"><h2>Content, Sessions & Angebote</h2>{editing ? <textarea value={profile.offers.join(", ")} onChange={e => setProfile(p => ({...p, offers:csvToArray(e.target.value)}))} placeholder="z. B. Shibari, Latex-Content, Fußfetisch, Bondage-Session, Workshops"/> : <div className="tagCloud">{profile.offers.length ? profile.offers.map(x => <span key={x}>{x}</span>) : <span>Noch nicht ausgefüllt</span>}</div>}</article>
 
-      <article className="profileCard"><h2>Suche ich</h2>{editing ? <textarea value={profile.seeks.join(", ")} onChange={e => setProfile(p => ({...p, seeks:csvToArray(e.target.value)}))}/> : <div className="tagCloud">{profile.seeks.length ? profile.seeks.map(x => <span key={x}>{x}</span>) : <span>Noch nicht ausgefüllt</span>}</div>}</article>
+      <article className="profileCard"><h2>Interessen & Kinks</h2>{editing ? <textarea value={profile.seeks.join(", ")} onChange={e => setProfile(p => ({...p, seeks:csvToArray(e.target.value)}))} placeholder="z. B. Rope, Leder, Latex, Worship, D/s, Sensory"/> : <div className="tagCloud">{profile.seeks.length ? profile.seeks.map(x => <span key={x}>{x}</span>) : <span>Noch nicht ausgefüllt</span>}</div>}</article>
 
       <article className="profileCard wide"><h2>Grenzen & Rahmen</h2>{editing ? <textarea value={profile.boundaries.join(", ")} onChange={e => setProfile(p => ({...p, boundaries:csvToArray(e.target.value)}))}/> : <div className="limitList">{profile.boundaries.map(x => <div key={x}>◆ {x}</div>)}</div>}</article>
 
-      <article className="profileCard wide"><h2>Studio & Verfügbarkeit</h2><textarea value={profile.studio_info} onChange={e => setProfile(p => ({...p, studio_info:e.target.value}))} disabled={!editing} placeholder="z. B. Berlin · Studiotage nach Kalender · diskreter Zugang"/><div className="availability"><div><strong>Kontakt</strong><span>{contactLabels[profile.contact_status] ?? profile.contact_status}</span></div><div><strong>Rollenbereich</strong><span>{["domina","dom"].includes(profile.role) ? "House führen · Aufgaben vergeben · Sessions anbieten" : "Bewerben · Aufgaben erfüllen · Sessions buchen"}</span></div></div></article>
+      <article className="profileCard wide"><h2>Sessions, Studio & Verfügbarkeit</h2><textarea value={profile.studio_info} onChange={e => setProfile(p => ({...p, studio_info:e.target.value}))} disabled={!editing} placeholder="z. B. Berlin · Shibari donnerstags · Content online · Workshops nach Kalender"/><div className="availability"><div><strong>Kontakt</strong><span>{contactLabels[profile.contact_status] ?? profile.contact_status}</span></div><div><strong>Dein Bereich</strong><span>{usageText}</span></div></div></article>
     </section>
 
     {editing && <div style={{display:"flex",justifyContent:"flex-end",marginTop:18}}><button className="editProfile" onClick={saveProfile} disabled={saving}>{saving ? "Speichere …" : "Änderungen speichern"}</button></div>}
