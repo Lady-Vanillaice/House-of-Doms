@@ -4,6 +4,7 @@ import "./alpha.css";
 import "./experience-layer.css";
 import "./red-gold-theme.css";
 import "./graffiti-font.css";
+import "./entrance-light-depth.css";
 import CalendarNavigation from "./calendar-navigation";
 import ExperienceLayer from "./experience-layer";
 import PublicDirectoryNav from "./public-directory-nav";
