@@ -13,6 +13,7 @@ import AuthenticatedBackRouter from "./authenticated-back-router";
 import DomCalendarSubscribe from "./dom-calendar-subscribe";
 import PwaRegister from "./pwa-register";
 import RoleSelectorMobileFix from "./role-selector-mobile-fix";
+import RoleCardRouter from "./role-card-router";
 
 export const metadata: Metadata = {
   title: "House of Doms",
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <DomCalendarSubscribe />
         <PwaRegister />
         <RoleSelectorMobileFix />
+        <RoleCardRouter />
         {children}
       </body>
     </html>
