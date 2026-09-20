@@ -32,8 +32,8 @@ on public.session_requests for select
 to authenticated
 using (
   creator_name = (
-    select pd.display_name from public.profile_details pd
-    where pd.user_id = auth.uid()
+    select p.display_name from public.profiles p
+    where p.id = auth.uid()
     limit 1
   )
 );
@@ -43,15 +43,15 @@ on public.session_requests for update
 to authenticated
 using (
   creator_name = (
-    select pd.display_name from public.profile_details pd
-    where pd.user_id = auth.uid()
+    select p.display_name from public.profiles p
+    where p.id = auth.uid()
     limit 1
   )
 )
 with check (
   creator_name = (
-    select pd.display_name from public.profile_details pd
-    where pd.user_id = auth.uid()
+    select p.display_name from public.profiles p
+    where p.id = auth.uid()
     limit 1
   )
 );
