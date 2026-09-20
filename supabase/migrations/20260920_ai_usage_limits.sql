@@ -54,9 +54,17 @@ declare
   v_spend numeric := 0;
   v_settings public.ai_usage_settings%rowtype;
   v_id uuid;
+  v_role text := '';
+  v_reserved_cost numeric := 0.005;
 begin
   if v_user is null then
     return query select null::uuid, false, 'not_authenticated', 0, 0, 0::numeric, 0::numeric;
+    return;
+  end if;
+
+  select lower(coalesce(p.role::text,'')) into v_role from public.profiles p where p.id = v_user;
+  if v_role not in ('dom','domina','creator') then
+    return query select null::uuid, false, 'creator_only', 0, 0, 0::numeric, 0::numeric;
     return;
   end if;
 
@@ -77,12 +85,11 @@ begin
   from public.ai_usage_events
   where user_id = v_user
     and created_at >= v_month_start
-    and status in ('reserved','completed');
+;
 
   select coalesce(sum(estimated_cost_usd),0) into v_spend
   from public.ai_usage_events
-  where created_at >= v_month_start
-    and status = 'completed';
+  where created_at >= v_month_start;
 
   if v_rate_count >= v_settings.per_minute_requests then
     return query select null::uuid, false, 'rate_limit', v_month_count, v_settings.monthly_creator_requests, v_spend, v_settings.global_monthly_budget_usd;
@@ -94,16 +101,16 @@ begin
     return;
   end if;
 
-  if v_spend >= v_settings.global_monthly_budget_usd then
+  if v_spend + v_reserved_cost > v_settings.global_monthly_budget_usd then
     return query select null::uuid, false, 'global_budget', v_month_count, v_settings.monthly_creator_requests, v_spend, v_settings.global_monthly_budget_usd;
     return;
   end if;
 
-  insert into public.ai_usage_events (user_id, feature)
-  values (v_user, p_feature)
+  insert into public.ai_usage_events (user_id, feature, estimated_cost_usd)
+  values (v_user, p_feature, v_reserved_cost)
   returning id into v_id;
 
-  return query select v_id, true, null::text, v_month_count + 1, v_settings.monthly_creator_requests, v_spend, v_settings.global_monthly_budget_usd;
+  return query select v_id, true, null::text, v_month_count + 1, v_settings.monthly_creator_requests, v_spend + v_reserved_cost, v_settings.global_monthly_budget_usd;
 end;
 $$;
 
@@ -127,7 +134,7 @@ begin
     model = left(coalesce(p_model,''),120),
     input_tokens = greatest(coalesce(p_input_tokens,0),0),
     output_tokens = greatest(coalesce(p_output_tokens,0),0),
-    estimated_cost_usd = case when p_success then greatest(coalesce(p_estimated_cost_usd,0),0) else 0 end,
+    estimated_cost_usd = greatest(estimated_cost_usd, greatest(coalesce(p_estimated_cost_usd,0),0)),
     completed_at = now()
   where id = p_reservation_id
     and user_id = auth.uid();
@@ -165,12 +172,11 @@ begin
   from public.ai_usage_events
   where user_id = v_user
     and created_at >= v_month_start
-    and status in ('reserved','completed');
+;
 
   select coalesce(sum(estimated_cost_usd),0) into v_spend
   from public.ai_usage_events
-  where created_at >= v_month_start
-    and status = 'completed';
+  where created_at >= v_month_start;
 
   return query
   select
@@ -186,6 +192,9 @@ $$;
 
 revoke all on public.ai_usage_settings from anon, authenticated;
 revoke all on public.ai_usage_events from anon, authenticated;
+revoke all on function public.reserve_ai_request(text) from public;
+revoke all on function public.finish_ai_request(uuid,text,integer,integer,numeric,boolean) from public;
+revoke all on function public.get_ai_usage_status() from public;
 grant execute on function public.reserve_ai_request(text) to authenticated;
 grant execute on function public.finish_ai_request(uuid,text,integer,integer,numeric,boolean) to authenticated;
 grant execute on function public.get_ai_usage_status() to authenticated;
