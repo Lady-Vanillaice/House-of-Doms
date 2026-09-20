@@ -7,6 +7,7 @@ const sections=[
  ["Sub-Akten","Mitglieder, Verlauf, Aufgaben, Sessions und private Notizen","/mitglieder"],
  ["Abonnements","Membership-Pakete, Benefits, Preise und Laufzeiten verwalten","/abonnements"],
  ["Abonnenten","Abo-Anfragen, Zahlungen und aktive Memberships prüfen","/abonnements/abonnenten"],
+ ["KI Assist","Creator-Hilfe für Nachrichten und Aufgaben","/house/ki-assist"],
  ["Aufgaben","Aufgaben, Nachweise, Vorlagen und Freigaben","/aufgaben"],
  ["Aufgaben-Vorlagen","Wiederverwendbare Aufgaben und Serien vorbereiten","/aufgaben/vorlagen"],
  ["Kalender","Studio, Sessions, Handy-Kalender und Buchungen","/kalender"],
