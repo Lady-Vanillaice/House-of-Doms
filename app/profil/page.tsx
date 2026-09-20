@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "../../lib/supabase/client";
 import "./profil.css";
 
@@ -55,6 +57,9 @@ function csvToArray(value: string) {
 }
 
 export default function ProfilePage() {
+  const searchParams = useSearchParams();
+  const publicName = searchParams.get("name");
+  const publicPreview = Boolean(publicName);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -70,6 +75,10 @@ export default function ProfilePage() {
   useEffect(() => {
     async function load() {
       try {
+        if (publicPreview) {
+          const demo = {...emptyProfile, display_name: publicName || "Lady Vanillaice", role: publicName === "Raven" ? "switch" : "domina", bio: "Creator-Profil im House mit Content, Sessions, Kinks und klar abgesprochenem Rahmen.", location: publicName === "Rope Atelier" ? "Hamburg" : publicName === "Noir Latex" ? "Köln" : publicName === "Raven" ? "Leipzig" : "Berlin", languages:["DE","EN"], offers:["Content","Sessions","Memberships"], seeks:["Bondage","Worship","Fetish"], boundaries:["Consent first","Klare Absprache"], contact_status:"open", studio_info:"Termine nach Verfügbarkeit", is_verified:true, visibility:"public"};
+          setProfile(demo as Profile); setLoading(false); return;
+        }
         const supabase = createClient();
         const { data: authData, error: authError } = await supabase.auth.getUser();
         if (authError || !authData.user) {
@@ -109,7 +118,7 @@ export default function ProfilePage() {
       }
     }
     load();
-  }, []);
+  }, [publicPreview, publicName]);
 
   async function saveProfile() {
     setSaving(true);
