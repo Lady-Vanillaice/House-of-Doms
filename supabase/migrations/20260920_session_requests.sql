@@ -26,3 +26,32 @@ using (auth.uid() = requester_id);
 create index if not exists session_requests_requester_idx on public.session_requests(requester_id);
 create index if not exists session_requests_creator_idx on public.session_requests(creator_name);
 create index if not exists session_requests_date_idx on public.session_requests(requested_date);
+
+create policy "creators can read requests addressed to them"
+on public.session_requests for select
+to authenticated
+using (
+  creator_name = (
+    select pd.display_name from public.profile_details pd
+    where pd.user_id = auth.uid()
+    limit 1
+  )
+);
+
+create policy "creators can update requests addressed to them"
+on public.session_requests for update
+to authenticated
+using (
+  creator_name = (
+    select pd.display_name from public.profile_details pd
+    where pd.user_id = auth.uid()
+    limit 1
+  )
+)
+with check (
+  creator_name = (
+    select pd.display_name from public.profile_details pd
+    where pd.user_id = auth.uid()
+    limit 1
+  )
+);
