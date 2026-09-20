@@ -12,6 +12,7 @@ type TaskFeedItem = { id:string; assigned_to:string; release_at:string; is_relea
 const cards=[
   ["Kammer","Nachrichten, Bilder, Videos und Aufgaben", "/kammer","✦"],
   ["Kalender","Studio-Zeiten, Sessions und Termine", "/kalender","◷"],
+  ["Session-Anfragen","Neue Buchungsanfragen bestätigen oder ablehnen", "/sessions","◆"],
   ["Aufgaben","Aufgaben erstellen, Vorlagen und Nachweise", "/aufgaben","✓"],
   ["Mitglieder","Sub-Akten, Verlauf und House-Mitglieder", "/mitglieder","◎"],
   ["Timeline","Alle House-Aktivitäten chronologisch", "/timeline","⌁"],
