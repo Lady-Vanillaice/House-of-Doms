@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "../../lib/supabase/client";
 import "./profil.css";
 
@@ -55,6 +57,9 @@ function csvToArray(value: string) {
 }
 
 export default function ProfilePage() {
+  const searchParams = useSearchParams();
+  const publicName = searchParams.get("name");
+  const publicPreview = Boolean(publicName);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -70,6 +75,10 @@ export default function ProfilePage() {
   useEffect(() => {
     async function load() {
       try {
+        if (publicPreview) {
+          const demo = {...emptyProfile, display_name: publicName || "Lady Vanillaice", role: publicName === "Raven" ? "switch" : "domina", bio: "Creator-Profil im House mit Content, Sessions, Kinks und klar abgesprochenem Rahmen.", location: publicName === "Rope Atelier" ? "Hamburg" : publicName === "Noir Latex" ? "Köln" : publicName === "Raven" ? "Leipzig" : "Berlin", languages:["DE","EN"], offers:["Content","Sessions","Memberships"], seeks:["Bondage","Worship","Fetish"], boundaries:["Consent first","Klare Absprache"], contact_status:"open", studio_info:"Termine nach Verfügbarkeit", is_verified:true, visibility:"public"};
+          setProfile(demo as Profile); setLoading(false); return;
+        }
         const supabase = createClient();
         const { data: authData, error: authError } = await supabase.auth.getUser();
         if (authError || !authData.user) {
@@ -109,7 +118,7 @@ export default function ProfilePage() {
       }
     }
     load();
-  }, []);
+  }, [publicPreview, publicName]);
 
   async function saveProfile() {
     setSaving(true);
@@ -147,6 +156,7 @@ export default function ProfilePage() {
   if (loading) return <main className="profilePage"><section className="profileHero"><div className="profileHeroCopy"><span className="eyebrow">PROFIL WIRD GELADEN</span><h1>Einen Moment …</h1></div></section></main>;
 
   return <main className="profilePage">
+    {publicPreview && <nav className="publicProfileNav"><Link href="/discover">← DISCOVER</Link><Link href="/">HOUSE OF DOMS</Link><Link href="/anmelden">LOGIN</Link></nav>}
     <section className="profileHero">
       <div className="profileAvatar">{initials}</div>
       <div className="profileHeroCopy">
@@ -161,8 +171,7 @@ export default function ProfilePage() {
         </div>
       </div>
       <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-        <button className="editProfile" onClick={() => setEditing(!editing)}>{editing ? "Vorschau" : "Profil bearbeiten"}</button>
-        <button className="editProfile" onClick={signOut}>Abmelden</button>
+        {publicPreview ? <><Link className="editProfile profileAction" href="/nachrichten">NACHRICHT</Link><Link className="editProfile profileAction primaryAction" href="/events">SESSION BUCHEN</Link></> : <><button className="editProfile" onClick={() => setEditing(!editing)}>{editing ? "Vorschau" : "Profil bearbeiten"}</button><button className="editProfile" onClick={signOut}>Abmelden</button></>}
       </div>
     </section>
 
@@ -189,6 +198,8 @@ export default function ProfilePage() {
 
       <article className="profileCard wide"><h2>Sessions, Studio & Verfügbarkeit</h2><textarea value={profile.studio_info} onChange={e => setProfile(p => ({...p, studio_info:e.target.value}))} disabled={!editing} placeholder="z. B. Berlin · Shibari donnerstags · Content online · Workshops nach Kalender"/><div className="availability"><div><strong>Kontakt</strong><span>{contactLabels[profile.contact_status] ?? profile.contact_status}</span></div><div><strong>Dein Bereich</strong><span>{usageText}</span></div></div></article>
     </section>
+
+    {publicPreview && <section className="publicOffers"><article><span>CONTENT</span><h2>Exklusive Sets & Videos</h2><p>Private Releases, neue Collections und Inhalte für Members.</p><Link href="/growth">CONTENT ANSEHEN →</Link></article><article><span>SESSIONS</span><h2>Persönlich & online</h2><p>Individuelle Termine mit vorher abgestimmtem Rahmen und klaren Grenzen.</p><Link href="/events">TERMIN ANFRAGEN →</Link></article><article><span>MEMBERSHIP</span><h2>Näher ans House</h2><p>Exklusive Inhalte, Updates und früher Zugang zu neuen Releases.</p><Link href="/anmelden">MEMBERSHIP →</Link></article></section>}
 
     {editing && <div style={{display:"flex",justifyContent:"flex-end",marginTop:18}}><button className="editProfile" onClick={saveProfile} disabled={saving}>{saving ? "Speichere …" : "Änderungen speichern"}</button></div>}
   </main>;
