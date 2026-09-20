@@ -9,6 +9,7 @@ const links=[
   ["House","/house"],
   ["Kammer","/kammer"],
   ["Kalender","/kalender"],
+  ["Sessions","/sessions"],
   ["Discover","/discover"],
   ["Profil","/profil"]
 ] as const;
