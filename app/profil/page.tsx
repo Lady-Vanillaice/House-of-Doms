@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "../../lib/supabase/client";
@@ -57,6 +57,10 @@ function csvToArray(value: string) {
 }
 
 export default function ProfilePage() {
+  return <Suspense fallback={<main className="profilePage"><section className="profileHero"><div className="profileHeroCopy"><span className="eyebrow">PROFIL WIRD GELADEN</span><h1>Einen Moment …</h1></div></section></main>}><ProfileContent /></Suspense>;
+}
+
+function ProfileContent() {
   const searchParams = useSearchParams();
   const publicName = searchParams.get("name");
   const publicPreview = Boolean(publicName);
