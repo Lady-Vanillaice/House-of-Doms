@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "../../lib/supabase/client";
 import "../management.css";
@@ -15,6 +15,10 @@ const initial: Session[] = [];
 const labels: Record<Status,string> = { requested:"Angefragt", confirmed:"Bestätigt", completed:"Abgeschlossen", cancelled:"Storniert", declined:"Abgelehnt" };
 
 export default function SessionsPage(){
+  return <Suspense fallback={<main className="managementPage"><p className="notice">Sessions werden geladen …</p></main>}><SessionsContent/></Suspense>;
+}
+
+function SessionsContent(){
   const searchParams=useSearchParams();
   const creator=searchParams.get("creator");
   const [role,setRole]=useState<Role>("dom");
