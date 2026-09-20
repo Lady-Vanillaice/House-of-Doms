@@ -24,7 +24,7 @@ export default function CreatorAiAssist(){
        ?await fetch("/api/ai/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[{direction:"incoming",text:messageInput}],tone:"freundlich, klar, professionell"})})
        :await fetch("/api/ai/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt:taskInput})});
      const data=await response.json();
-     if(!response.ok)throw new Error(data.error||"KI Assist konnte keinen Entwurf erstellen.");
+     if(!response.ok)throw new Error([data.error,data.detail].filter(Boolean).join(" — ")||"KI Assist konnte keinen Entwurf erstellen.");
      if(mode==="messages")setOutput(data.draft||"");
      else setOutput([data.title,data.description,`Nachweis: ${(data.proof||[]).join(", ")}`,`Freigabe in: ${data.releaseDelayHours||0} Std. · Fällig in: ${data.dueDelayHours||24} Std.`].filter(Boolean).join("\n\n"));
    }catch(e){setError(e instanceof Error?e.message:"KI Assist konnte keinen Entwurf erstellen.");}
