@@ -63,6 +63,7 @@ begin
   end if;
 
   select lower(coalesce(p.role::text,'')) into v_role from public.profiles p where p.id = v_user;
+  v_role := coalesce(v_role,'');
   if v_role not in ('dom','domina','creator') then
     return query select null::uuid, false, 'creator_only', 0, 0, 0::numeric, 0::numeric;
     return;
