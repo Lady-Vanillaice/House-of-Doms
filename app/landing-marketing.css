@@ -6,3 +6,13 @@
 
 /* On phones, use the real clickable nav row instead of the legacy decorative text strip. */
 @media(max-width:560px){.publicLanding .referenceNav{height:64px!important;grid-template-columns:1fr auto;align-items:center!important;padding-top:0!important}.publicLanding .referenceNavActions{padding-top:0}.publicLanding .referenceNav:after{content:none!important;display:none!important}.marketingMobileNav{display:flex!important;top:64px!important;z-index:79!important}.publicLanding .referenceEntrance{padding-top:106px!important}}
+
+.aiAssistDemo{border-top:1px solid rgba(212,175,55,.16);border-bottom:1px solid rgba(212,175,55,.16)}
+.aiAssistDemoIntro{max-width:760px}.aiAssistDemoGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+.aiAssistDemoCard{border:1px solid rgba(212,175,55,.24);background:rgba(10,8,10,.72);padding:22px;display:flex;flex-direction:column;gap:14px}
+.aiAssistDemoCard>span{font-size:11px;letter-spacing:.18em;opacity:.65}.aiDemoBubble,.aiDemoPrompt{padding:15px 16px;border-radius:14px;line-height:1.55}
+.aiDemoBubble.incoming{background:rgba(255,255,255,.06);align-self:flex-start;max-width:88%}.aiDemoBubble.draft{border:1px solid rgba(212,175,55,.3);background:rgba(212,175,55,.07)}
+.aiDemoBubble small{display:block;font-size:9px;letter-spacing:.16em;margin-bottom:7px;opacity:.6}.aiDemoAction{align-self:flex-start;border:1px solid rgba(212,175,55,.5);border-radius:999px;padding:8px 12px;font-size:12px}
+.aiAssistDemoCard em{font-size:11px;opacity:.5}.aiDemoPrompt{background:rgba(255,255,255,.05);font-style:italic}.aiDemoTasks{display:grid;gap:8px}.aiDemoTasks b{padding:10px 12px;border-left:2px solid rgba(212,175,55,.65);background:rgba(255,255,255,.025);font-size:13px}
+.aiAssistDemoCard .marketingButton{align-self:flex-start;margin-top:auto}
+@media(max-width:760px){.aiAssistDemoGrid{grid-template-columns:1fr}.aiAssistDemoCard{padding:17px}}
