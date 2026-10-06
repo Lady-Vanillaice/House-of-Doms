@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run check:flow && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:flow": "node scripts/check-core-flow.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.3",

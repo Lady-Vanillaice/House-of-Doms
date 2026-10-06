@@ -14,9 +14,9 @@ const benefitOptions=[
 
 export default function SubscriptionsPage(){
  const[loading,setLoading]=useState(true),[role,setRole]=useState(""),[plans,setPlans]=useState<Plan[]>([]),[message,setMessage]=useState("");
- async function load(){setLoading(true);const s=createClient();const{data:a}=await s.auth.getUser();if(!a.user){location.href="/anmelden";return}const{data:c,error:ce}=await s.rpc("get_subscription_context");if(ce){setMessage(ce.message);setLoading(false);return}const ctx=Array.isArray(c)?c[0]:c;const r=String(ctx?.role||"").toLowerCase();setRole(r);const rpc=["dom","domina"].includes(r)?"get_my_subscription_plans":"get_available_subscription_plans";const{data,error}=await s.rpc(rpc);if(error)setMessage(error.message);else setPlans((data||[]) as Plan[]);setLoading(false)}
+ async function load(){setLoading(true);const s=createClient();const{data:a}=await s.auth.getUser();if(!a.user){location.href="/anmelden";return}const{data:c,error:ce}=await s.rpc("get_subscription_context");if(ce){setMessage(ce.message);setLoading(false);return}const ctx=Array.isArray(c)?c[0]:c;const r=String(ctx?.role||"").toLowerCase();setRole(r);const rpc=["dom","domina","switch"].includes(r)?"get_my_subscription_plans":"get_available_subscription_plans";const{data,error}=await s.rpc(rpc);if(error)setMessage(error.message);else setPlans((data||[]) as Plan[]);setLoading(false)}
  useEffect(()=>{void load()},[]);
- const isDom=role==="dom"||role==="domina";
+ const isDom=["dom","domina","switch"].includes(role);
  if(loading)return <main className="subsPage"><section className="subsGate">Abonnements werden geladen …</section></main>;
  return <main className="subsPage"><header className="subsHero"><div><Link href="/house">← House</Link><span>HOUSE OF DOMS · MEMBERSHIPS</span><h1>{isDom?"Deine Abonnements":"Mitglied werden"}</h1><p>{isDom?"Erstelle eigene Memberships mit Preis, Laufzeit, Plätzen und freigeschalteten Vorteilen.":"Wähle das Membership-Paket deines Houses. Vorteile werden nach Aktivierung automatisch deinem Account zugeordnet."}</p></div></header>{message&&<div className="subsNotice">{message}</div>}
  {isDom?<DomManager plans={plans} reload={load} setMessage={setMessage}/>:<SubOffers plans={plans} reload={load} setMessage={setMessage}/>}</main>
