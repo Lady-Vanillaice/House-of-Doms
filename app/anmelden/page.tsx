@@ -32,10 +32,9 @@ function AnmeldenContent() {
     try {
       const supabase = createClient();
       if (mode === "login") {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        const r = String(data?.user?.user_metadata?.role ?? "");
-        window.location.href = ["dom","domina","switch"].includes(r) ? "/hub" : "/hub";
+        window.location.href = "/hub";
       } else {
         const displayName = String(form.get("displayName") ?? "");
         const role = String(form.get("role") ?? defaultRole);
