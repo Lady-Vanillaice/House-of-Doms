@@ -32,9 +32,10 @@ function AnmeldenContent() {
     try {
       const supabase = createClient();
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        window.location.href = "/profil";
+        const r = String(data?.user?.user_metadata?.role ?? "");
+        window.location.href = ["dom","domina","switch"].includes(r) ? "/hub" : "/hub";
       } else {
         const displayName = String(form.get("displayName") ?? "");
         const role = String(form.get("role") ?? defaultRole);
@@ -96,7 +97,7 @@ function AnmeldenContent() {
         <button className="authMode" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
           {mode === "login" ? "Noch kein Konto? Jetzt registrieren" : "Bereits registriert? Jetzt anmelden"}
         </button>
-        <small>{mode === "register" && ["creator", "both"].includes(requestedUse ?? "") ? "Als Creator startest du nach der Bestätigung direkt mit deinem Onboarding." : "Nach erfolgreicher Anmeldung wirst du direkt zu deinem Profil weitergeleitet."}</small>
+        <small>{mode === "register" && ["creator", "both"].includes(requestedUse ?? "") ? "Als Creator startest du nach der Bestätigung direkt mit deinem Onboarding." : "Nach erfolgreicher Anmeldung wirst du direkt zu deinem persönlichen House-Bereich weitergeleitet."}</small>
       </section>
     </main>
   );
