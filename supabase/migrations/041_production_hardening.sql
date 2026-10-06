@@ -11,6 +11,18 @@ returns boolean language sql security definer set search_path=public stable as $
 $$;
 grant execute on function public.is_creator_user(uuid) to authenticated;
 
+create or replace function public.is_dom_user(user_id uuid)
+returns boolean language sql stable security definer set search_path=public as $
+  select exists(select 1 from public.profiles p where p.id=user_id and p.role::text in ('dom','domina','switch'));
+$;
+create or replace function public.is_sub_user(user_id uuid)
+returns boolean language sql stable security definer set search_path=public as $
+  select exists(select 1 from public.profiles p where p.id=user_id and p.role::text in ('sub','sklave','switch'));
+$;
+grant execute on function public.is_dom_user(uuid) to authenticated;
+grant execute on function public.is_sub_user(uuid) to authenticated;
+
+
 create or replace function public.cashbook_is_dom()
 returns boolean language sql security definer set search_path=public stable as $$
   select public.is_creator_user(auth.uid());
