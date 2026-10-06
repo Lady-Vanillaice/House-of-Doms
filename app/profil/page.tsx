@@ -131,6 +131,8 @@ function ProfileContent() {
         updated_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
       if (error) throw error;
+      const { error: roleError } = await supabase.rpc("sync_my_profile_role", { p_role: profile.role });
+      if (roleError) throw roleError;
       setEditing(false);
       setMessage("Profil gespeichert.");
     } catch (error) {
