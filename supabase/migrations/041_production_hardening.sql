@@ -202,41 +202,8 @@ update public.creator_media
 set is_published=false,updated_at=now()
 where access_mode in ('ppv','members') and coalesce(storage_path,'')='';
 
-drop policy if exists "creator private upload own folder" on storage.objects;
-create policy "creator private upload own folder" on storage.objects for insert to authenticated
-with check(
- bucket_id='creator-private-media'
- and (storage.foldername(name))[1]=auth.uid()::text
- and public.is_creator_user(auth.uid())
-);
-
-drop policy if exists "creator private owners delete" on storage.objects;
-create policy "creator private owners delete" on storage.objects for delete to authenticated
-using(bucket_id='creator-private-media' and (storage.foldername(name))[1]=auth.uid()::text);
-
-drop policy if exists "creator private authorized read" on storage.objects;
-create policy "creator private authorized read" on storage.objects for select to authenticated
-using(
- bucket_id='creator-private-media'
- and exists(
-   select 1 from public.creator_media m
-   where m.storage_bucket='creator-private-media' and m.storage_path=name and m.is_published=true
-   and (
-     m.owner_id=auth.uid()
-     or (m.access_mode='ppv' and exists(
-       select 1 from public.creator_media_purchases p
-       where p.media_id=m.id and p.buyer_id=auth.uid() and p.status='paid'
-     ))
-     or (m.access_mode='members' and exists(
-       select 1 from public.houses h
-       join public.house_subscriptions s on s.house_id=h.id
-       where h.owner_id=m.owner_id and s.subscriber_id=auth.uid()
-         and s.status in ('trialing','active')
-         and (s.current_period_end is null or s.current_period_end>now())
-     ))
-   )
- )
-);
+-- Private creator media is intentionally not exposed through Storage RLS.
+-- Uploads and signed delivery go through server routes using SUPABASE_SERVICE_ROLE_KEY.
 
 create or replace function public.save_creator_media_secure(
  p_id uuid default null,p_media_url text default null,p_storage_bucket text default null,p_storage_path text default null,
@@ -275,6 +242,24 @@ begin
  return v_id;
 end $$;
 grant execute on function public.save_creator_media_secure(uuid,text,text,text,text,text,text,text,integer,text[],boolean,integer) to authenticated;
+
+create or replace function public.get_creator_media_private_ref(p_media_id uuid)
+returns table(storage_bucket text,storage_path text)
+language sql security definer set search_path=public stable as $
+ select m.storage_bucket,m.storage_path
+ from public.creator_media m
+ where m.id=p_media_id and m.is_published=true and m.storage_bucket='creator-private-media' and nullif(m.storage_path,'') is not null
+ and (
+   m.owner_id=auth.uid()
+   or (m.access_mode='ppv' and exists(select 1 from public.creator_media_purchases p where p.media_id=m.id and p.buyer_id=auth.uid() and p.status='paid'))
+   or (m.access_mode='members' and exists(
+     select 1 from public.houses h join public.house_subscriptions s on s.house_id=h.id
+     where h.owner_id=m.owner_id and s.subscriber_id=auth.uid() and s.status in ('trialing','active')
+       and (s.current_period_end is null or s.current_period_end>now())
+   ))
+ );
+$;
+grant execute on function public.get_creator_media_private_ref(uuid) to authenticated;
 
 drop function if exists public.get_creator_media_for_site_v2(text);
 create function public.get_creator_media_for_site_v2(p_slug text)
