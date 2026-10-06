@@ -93,7 +93,7 @@ export default function DashboardPage(){
         <Link href="/kammer"><span>✦</span><strong>Kammer</strong><small>Nachrichten öffnen</small></Link>
         <Link href="/kalender"><span>◷</span><strong>Kalender</strong><small>Termine ansehen</small></Link>
         <Link href="/keuschhaltung"><span>◇</span><strong>Keuschhaltung</strong><small>Status & Check-ins</small></Link>
-        <Link href="/profil"><span>◉</span><strong>Profil</strong><small>Mein Bereich</small></Link>
+        <Link href="/hub"><span>◉</span><strong>Profil</strong><small>Mein Bereich</small></Link>
       </section>
     </main>;
   }
