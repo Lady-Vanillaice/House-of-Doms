@@ -40,17 +40,25 @@ function AnmeldenContent() {
         const role = String(form.get("role") ?? defaultRole);
         const adult = form.get("adult") === "on";
         if (!adult) throw new Error("Bitte bestätige, dass du mindestens 18 Jahre alt bist.");
+        const creatorFlow = ["dom", "domina", "switch"].includes(role);
+        const nextPath = creatorFlow ? "/creator/onboarding" : "/profil";
 
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/profil`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
             data: { display_name: displayName, role, is_adult_confirmed: adult },
           },
         });
         if (error) throw error;
-        setMessage("Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse. Danach wirst du direkt zu deinem Profil weitergeleitet.");
+        if (signUpData.session) {
+          window.location.href = nextPath;
+          return;
+        }
+        setMessage(creatorFlow
+          ? "Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse. Danach startet direkt dein Creator-Onboarding."
+          : "Registrierung erfolgreich. Bitte bestätige deine E-Mail-Adresse. Danach wirst du direkt zu deinem Profil weitergeleitet.");
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Ein unbekannter Fehler ist aufgetreten.");
@@ -88,7 +96,7 @@ function AnmeldenContent() {
         <button className="authMode" onClick={() => { setMode(mode === "login" ? "register" : "login"); setMessage(""); }}>
           {mode === "login" ? "Noch kein Konto? Jetzt registrieren" : "Bereits registriert? Jetzt anmelden"}
         </button>
-        <small>Nach erfolgreicher Anmeldung wirst du direkt zu deinem Profil weitergeleitet.</small>
+        <small>{mode === "register" && ["creator", "both"].includes(requestedUse ?? "") ? "Als Creator startest du nach der Bestätigung direkt mit deinem Onboarding." : "Nach erfolgreicher Anmeldung wirst du direkt zu deinem Profil weitergeleitet."}</small>
       </section>
     </main>
   );
